@@ -1,0 +1,5 @@
+def parse_date(dateStr):
+	if dateStr == "":
+		pass
+	else:
+		return arcpy.time.ParseDateTimeString(dateStr).strftime('%Y-%m-%d')
