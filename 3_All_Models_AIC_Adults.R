@@ -56,9 +56,6 @@ allModels_predict <- allModels %>%
     males   = purrr::map(predict, 2)
   )
 
-allModels_predict <- allModels %>% 
-  dplyr::mutate(females = purrr::map(., get_len))
-
 
 # Print out into a formatted list so you can use them all in the AIC function. 
 # This is a total hack because I can't figure out how to loop on the AIC function.
@@ -133,33 +130,3 @@ males_g0 <- generate_table("males", 2)
 males_sigma <- generate_table("males", 3) 
 
 
-##### Illustrate single row extract
-
-exampleModel2 <- as_tibble(allModels[["females"]][["Model01_1_1_1"]][2,], rownames = NULL) %>% 
-  select(-link) %>%
-  mutate(ModelName = model) %>%
-  column_to_rownames(var = "ModelName")
-
-##### Illustrate single row extract for all models
-tempList = list()
-i <- 1
-for (model in modelNames) {
-  elem <- as_tibble(allModels[["females"]][[glue("{model}")]][2,], rownames = NULL) %>% 
-    select(-link) %>%
-    mutate(ModelName = model) %>%
-    column_to_rownames(var = "ModelName")
-  
-  tempList[[i]] <- elem # add it to your list
-  i <- i + 1
-}
-
-combined_table <- do.call(rbind, tempList)
-
-sorted_table <- combined_table %>% 
-  sort_with_aic() %>%
-  mutate(AICcwt = AIC[ ,8]) %>% 
-  mutate(AIC_estimate = estimate * AICcwt) %>% 
-  mutate(AIC_SE.estimate = SE.estimate * AICcwt) %>% 
-  mutate(AIC_lcl = lcl * AICcwt) %>% 
-  mutate(AIC_ucl = ucl * AICcwt) %>%  
-  adorn_totals("row", name = "-999") 
