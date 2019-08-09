@@ -18,7 +18,7 @@ source(here("functions.R"))
 
 
 # Set variables and paths specific to island and year
-setwd(here("SMI","2018","Adult models"))
+setwd(here("ExampleData"))
 island <- "SMI"
 year <- "2018"
 
