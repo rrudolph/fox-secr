@@ -35,11 +35,40 @@ sort_with_aic <- function(table){
 
 # Generate a table based on the list of models. This function
 # requires the sex (the name of the model in allModels) and the row within that model that contains the data. 
-generate_table <- function(sex, row){
+generate_table <- function(sex, age, param){
+  print(glue("Sex: {sex} Age: {age} Param: {param}"))
+  if (param == "D"){
+    row = 1
+  }else if (param == "g0"){
+    row = 2
+  }else if (param == "sigma"){
+    row = 3
+  } else stop("Error, please select 'D', 'g0', or 'sigma'")
+  
+  
   tempList = list()
   i <- 1
   for (model in modelNames) {
-    elem <- as_tibble(allModels_predict[[glue("{model}")]][[sex]][row,], rownames = NULL) %>% 
+    
+    modelLen <- length(allModels_predict[[glue("{model}")]])
+    
+    if (age == "adult" & sex == "female") {
+      index = 1
+    }else if (age == "adult" & sex == "male"){
+      index = 2
+    }else if (age == "pup" & sex == "female" & modelLen == 4){
+      index = 3
+    }else if (age == "pup" & sex == "male" & modelLen == 4){
+      index = 4
+    }else if (age == "pup" & sex == "female" & modelLen > 4){
+      index = 5
+    }else if (age == "pup" & sex == "male" & modelLen > 4){
+      index = 6
+    }else stop("Error, please check your adults/pups parameters and try again")
+    
+    
+    
+    elem <- as_tibble(allModels_predict[[glue("{model}")]][[index]][row,], rownames = NULL) %>% 
       select(-link) %>%
       mutate(ModelName = model) %>%
       column_to_rownames(var = "ModelName")
