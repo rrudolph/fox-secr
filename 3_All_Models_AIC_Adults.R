@@ -40,21 +40,14 @@ for (file in allFiles){
 }
 
 
-#########################################
-#  Colin Rundel's technique using purrr.#
-#########################################
 allModels <- map(ls(pattern = "Model"), get)
 modelNames <- tools::file_path_sans_ext(allFiles)
 names(allModels) <- modelNames
 
-# Use purrr to make a big list of lists of all the models
-allModels_predict <- allModels %>% 
-  dplyr::mutate(predict = purrr::map(allModels, ~predict(.x, newdata = NULL, type = c('response','link'), se.fit = TRUE, alpha = .2))
-         ) %>%
-  dplyr::mutate(
-    females = purrr::map(predict, 1),
-    males   = purrr::map(predict, 2)
-  )
+
+# Run map on the models to get a new variable with the predict for each sex and or age
+allModels_predict <- purrr::map(allModels, ~predict(.x, newdata = NULL, type = c('response','link'), se.fit = TRUE, alpha = .2))
+
 
 
 # Print out into a formatted list so you can use them all in the AIC function. 
@@ -101,24 +94,22 @@ options("scipen"=100, "digits"=4)
 
 # Generate the tables, optionally spit out an excel spreadsheet if desired. 
 
-# Females 
-females_D <- generate_table("females", 1)  %>% 
+# Females 1
+females_D <- generate_table(1, 1)  %>% 
   rbind(., as.numeric(.[nrow(.),]) * islandArea)
+females_D[nrow(females_D),1]<-"IslandArea" 
 
-rownames(females_D)[nrow(females_D) - 1]<-"Total"
-rownames(females_D)[nrow(females_D)]<-"IslandArea" 
 write.xlsx(females_D, glue("{island}_{year}_females_D.xlsx"))
 
 
+females_g0 <- generate_table(1, 2) 
 
-females_g0 <- generate_table("females", 2) 
-
-females_sigma <- generate_table("females", 3) 
-
+females_sigma <- generate_table(1, 3) 
 
 
-# Males
-males_D <- generate_table("males", 1) %>% 
+
+# Males 2
+males_D <- generate_table(2, 1) %>% 
   rbind(., as.numeric(.[nrow(.),]) * islandArea)
 
 rownames(males_D)[nrow(males_D) - 1]<-"Total"
@@ -126,7 +117,7 @@ rownames(males_D)[nrow(males_D)]<-"IslandArea"
 write.xlsx(males_D, glue("{island}_{year}_males_D.xlsx"))
 
 
-males_g0 <- generate_table("males", 2) 
-males_sigma <- generate_table("males", 3) 
+males_g0 <- generate_table(2, 2) 
+males_sigma <- generate_table(2, 3) 
 
 

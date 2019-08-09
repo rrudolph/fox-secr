@@ -39,7 +39,7 @@ generate_table <- function(sex, row){
   tempList = list()
   i <- 1
   for (model in modelNames) {
-    elem <- as_tibble(allModels_predict[[glue("{sex}")]][[glue("{model}")]][row,], rownames = NULL) %>% 
+    elem <- as_tibble(allModels_predict[[glue("{model}")]][[sex]][row,], rownames = NULL) %>% 
       select(-link) %>%
       mutate(ModelName = model) %>%
       column_to_rownames(var = "ModelName")
@@ -52,12 +52,13 @@ generate_table <- function(sex, row){
   
   sorted_table <- combined_table %>% 
     sort_with_aic() %>%
+    rownames_to_column('ModelName') %>%
     mutate(AICcwt = AIC[ ,8]) %>% 
     mutate(AIC_estimate = estimate * AICcwt) %>% 
     mutate(AIC_SE.estimate = SE.estimate * AICcwt) %>% 
     mutate(AIC_lcl = lcl * AICcwt) %>% 
     mutate(AIC_ucl = ucl * AICcwt) %>%  
-    adorn_totals("row", name = "-999") 
+    adorn_totals("row") 
   
   return(sorted_table)
   
