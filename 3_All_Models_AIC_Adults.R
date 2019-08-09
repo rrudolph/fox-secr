@@ -62,7 +62,7 @@ for (model in modelNames){
 
 
 # Cut and paste the output from the above list list of models into the AIC function. 
-AIC <- AIC(Model001_session_1_1,
+all_AIC <- AIC(Model001_session_1_1,
            Model002_session_1_session,
            Model003_session_1_h2,
            Model004_session_1_b,
@@ -175,12 +175,7 @@ AIC <- AIC(Model001_session_1_1,
            Model111_session_session_h2_B_h2_B,
            Model112_session_session_h2_B_session_h2_B)
 
-AIC
-
-bigAIC <- as_tibble(lapply(allModels, AIC))
-bigAIC <- as_tibble(plyr::ldply(allModels, AIC))
-bigAIC <- as_tibble(purrr::map(allModels, AIC))
-
+all_AIC
 
 
 # Set the output to full numbers and not exponents.

@@ -25,8 +25,8 @@ loadRData <- function(fileName){
 # Sort a table with AIC score 
 sort_with_aic <- function(table){
   temp_sort <- NULL
-  for(i in 1:nrow(AIC)){
-    temp.row.name <- rownames(AIC)[i]
+  for(i in 1:nrow(all_AIC)){
+    temp.row.name <- rownames(all_AIC)[i]
     temp.row.estimate <- table[rownames(table)==temp.row.name, ]
     temp_sort <- rbind(temp_sort,temp.row.estimate)
   }
@@ -38,11 +38,11 @@ sort_with_aic <- function(table){
 generate_table <- function(sex, age, param){
   print(glue("Sex: {sex} Age: {age} Param: {param}"))
   if (param == "D"){
-    row = 1
+    tableRow = 1
   }else if (param == "g0"){
-    row = 2
+    tableRow = 2
   }else if (param == "sigma"){
-    row = 3
+    tableRow = 3
   } else stop("Error, please select 'D', 'g0', or 'sigma'")
   
   
@@ -68,7 +68,7 @@ generate_table <- function(sex, age, param){
     
     
     
-    elem <- as_tibble(allModels_predict[[glue("{model}")]][[index]][row,], rownames = NULL) %>% 
+    elem <- as_tibble(allModels_predict[[glue("{model}")]][[index]][tableRow,], rownames = NULL) %>% 
       select(-link) %>%
       mutate(ModelName = model) %>%
       column_to_rownames(var = "ModelName")
