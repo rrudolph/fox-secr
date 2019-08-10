@@ -60,27 +60,23 @@ names(all_AIC_temp) <- modelNames
 all_AIC <- AIC(all_AIC_temp)
 
 
-
 # Set the output to full numbers and not exponents.
 options("scipen"=100, "digits"=4)
 
 # ###Generate the tables, optionally spit out an excel spreadsheet if desired. 
 # Choices are 'female', 'male', 'adult', 'pup',  'D', 'g0', or 'sigma'
 
-# Females 1
+# Females 
 females_D <- generate_table("female", "adult", "D")  %>% 
   rbind(., as.numeric(.[nrow(.),]) * islandArea)
 females_D[nrow(females_D),1]<-"*IslandArea" 
-
 females_g0 <- generate_table("female", "adult", "g0")
-
 females_sigma <- generate_table("female", "adult", "sigma")
 
 
 # Males 
 males_D <- generate_table("male", "adult", "D") %>% 
   rbind(., as.numeric(.[nrow(.),]) * islandArea)
-
 males_g0 <- generate_table("male", "adult", "g0")
 males_sigma <- generate_table("male", "adult", "sigma") 
 

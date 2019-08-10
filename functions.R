@@ -69,7 +69,8 @@ generate_table <- function(sex, age, param){
       index = 5
     }else if (age == "pup" & sex == "male" & modelLen > 4){
       index = 6
-    }else stop("Error, please check your adults/pups parameters and try again")
+    }else stop(glue("Error, please check your adults/pups parameters and try again \n
+               Or are you running this on a model with no pups?? Model length is {modelLen}"))
     
     # Get a row based on user input and the logic above
     elem <- as_tibble(allModels_predict[[glue("{model}")]][[index]][tableRow,], rownames = NULL) %>% 
