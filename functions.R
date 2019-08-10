@@ -82,7 +82,7 @@ generate_table <- function(sex, age, param){
   sorted_table <- combined_table %>% 
     sort_with_aic() %>%
     rownames_to_column('ModelName') %>%
-    mutate(AICcwt = AIC[ ,8]) %>% 
+    mutate(AICcwt = all_AIC[ ,8]) %>% 
     mutate(AIC_estimate = estimate * AICcwt) %>% 
     mutate(AIC_SE.estimate = SE.estimate * AICcwt) %>% 
     mutate(AIC_lcl = lcl * AICcwt) %>% 
