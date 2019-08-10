@@ -37,6 +37,8 @@ sort_with_aic <- function(table){
 # requires the sex (the name of the model in allModels) and the row within that model that contains the data. 
 generate_table <- function(sex, age, param){
   print(glue("Sex: {sex} Age: {age} Param: {param}"))
+  
+  # Set what row to get the data from based on user input
   if (param == "D"){
     tableRow = 1
   }else if (param == "g0"){
@@ -48,10 +50,13 @@ generate_table <- function(sex, age, param){
   
   tempList = list()
   i <- 1
+  # Loop through the models to get the row for each one.
   for (model in modelNames) {
     
     modelLen <- length(allModels_predict[[glue("{model}")]])
     
+    # Use some logic to get the right data. The pups models have 8 tables, so
+    # there needs to be a way to get the right ones based on what the user needs
     if (age == "adult" & sex == "female") {
       index = 1
     }else if (age == "adult" & sex == "male"){
@@ -66,19 +71,21 @@ generate_table <- function(sex, age, param){
       index = 6
     }else stop("Error, please check your adults/pups parameters and try again")
     
-    
-    
+    # Get a row based on user input and the logic above
     elem <- as_tibble(allModels_predict[[glue("{model}")]][[index]][tableRow,], rownames = NULL) %>% 
-      select(-link) %>%
-      mutate(ModelName = model) %>%
-      column_to_rownames(var = "ModelName")
+      select(-link) %>% # remove the link row that nobody needs.
+      mutate(ModelName = model) %>% # put the model name in the table
+      column_to_rownames(var = "ModelName") # turn the model name int the row name.
     
     tempList[[i]] <- elem # add it to your list
     i <- i + 1
   }
   
+  # Merge all the data into one table
   combined_table <- do.call(rbind, tempList)
   
+  # Sort the table with AIC, add model names to the table, and add some needed
+  # calculations to the table
   sorted_table <- combined_table %>% 
     sort_with_aic() %>%
     rownames_to_column('ModelName') %>%
@@ -87,7 +94,7 @@ generate_table <- function(sex, age, param){
     mutate(AIC_SE.estimate = SE.estimate * AICcwt) %>% 
     mutate(AIC_lcl = lcl * AICcwt) %>% 
     mutate(AIC_ucl = ucl * AICcwt) %>%  
-    adorn_totals("row") 
+    adorn_totals("row") # add a row to the bottom with totals
   
   return(sorted_table)
   
