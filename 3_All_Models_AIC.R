@@ -72,8 +72,13 @@ options("scipen"=100, "digits"=4)
 females_D <- generate_table("female", "adult", "D")  %>% 
   rbind(., as.numeric(.[nrow(.),]) * islandArea)
 females_D[nrow(females_D),1]<-"*IslandArea" 
+write.xlsx(females_D, glue("{island}_{year}.xlsx"), sheetName="females_adults_D", append=T)
+
 females_g0 <- generate_table("female", "adult", "g0")
+write.xlsx(females_g0,glue("{island}_{year}.xlsx"), sheetName="females_adults_g0", append=T)
+
 females_sigma <- generate_table("female", "adult", "sigma")
+write.xlsx(females_sigma,glue("{island}_{year}.xlsx"), sheetName="females_adults_sigma", append=T)
 
 
 # Males 
@@ -89,3 +94,4 @@ females_pups_D <- generate_table("female", "pup", "D") %>%
 
 males_pups_D <- generate_table("male", "pup", "D") %>% 
   rbind(., as.numeric(.[nrow(.),]) * islandArea)
+
