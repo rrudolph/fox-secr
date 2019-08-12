@@ -8,21 +8,14 @@
 #  Set functions  #
 ###################
 
-# Function for returning the length of a model. Used for the adults/pups step 3
-get_len <- function(model){
-  return(length(model))
-}
-
-
-# Make a function that loads .Rdata files by the name of the file
+# Load .Rdata files by the name of the file.
 loadRData <- function(fileName){
   #loads an RData file, and returns it
   load(fileName)
   get(ls()[ls() != "fileName"])
 }
 
-
-# Sort a table with AIC score 
+# Sort a table with AIC score.
 sort_with_aic <- function(table){
   temp_sort <- NULL
   for(i in 1:nrow(all_AIC)){
@@ -33,8 +26,7 @@ sort_with_aic <- function(table){
   return(temp_sort)
 }
 
-# Generate a table based on the list of models. This function
-# requires the sex (the name of the model in allModels) and the row within that model that contains the data. 
+# Generate a table, extracting from a list of all models.
 generate_table <- function(sex, age, param){
   print(glue("Sex: {sex} Age: {age} Param: {param}"))
   
@@ -50,13 +42,15 @@ generate_table <- function(sex, age, param){
   
   tempList = list()
   i <- 1
-  # Loop through the models to get the row for each one.
+  # Loop through the models, compiling data based on the row in each table
+  # of the master list of data. 
   for (model in modelNames) {
     
     modelLen <- length(allModels_predict[[glue("{model}")]])
     
-    # Use some logic to get the right data. The pups models have 8 tables, so
-    # there needs to be a way to get the right ones based on what the user needs
+    # Use logic to get the correct data. If the models include pups,
+    # some will have 8 sets of data, so any model that has more than 4
+    # lists will need to be able to select the correct row based on user input. 
     if (age == "adult" & sex == "female") {
       index = 1
     }else if (age == "adult" & sex == "male"){
@@ -72,7 +66,7 @@ generate_table <- function(sex, age, param){
     }else stop(glue("Error, please check your adults/pups parameters and try again \n
                Or are you running this on a model with no pups?? Model length is {modelLen}"))
     
-    # Get a row based on user input and the logic above
+    # Using above logic choice and model loop, compile the row of data and add it to the list. 
     elem <- as_tibble(allModels_predict[[glue("{model}")]][[index]][tableRow,], rownames = NULL) %>% 
       select(-link) %>% # remove the link row that nobody needs.
       mutate(ModelName = model) %>% # put the model name in the table
@@ -82,11 +76,11 @@ generate_table <- function(sex, age, param){
     i <- i + 1
   }
   
-  # Merge all the data into one table
+  # Merge all the data into a single table.
   combined_table <- do.call(rbind, tempList)
   
   # Sort the table with AIC, add model names to the table, and add some needed
-  # calculations to the table
+  # calculations to the table.
   sorted_table <- combined_table %>% 
     sort_with_aic() %>%
     rownames_to_column('ModelName') %>%
