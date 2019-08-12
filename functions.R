@@ -28,7 +28,7 @@ sort_with_aic <- function(table){
 
 # Generate a table, extracting from a list of all models.
 generate_table <- function(sex, age, param){
-  print(glue("Sex: {sex} Age: {age} Param: {param}"))
+  print(glue("Input criteria: Sex {sex} Age {age} Param {param}"))
   
   # Set what row to get the data from based on user input
   if (param == "D"){
@@ -39,6 +39,7 @@ generate_table <- function(sex, age, param){
     tableRow = 3
   } else stop("Error, please select 'D', 'g0', or 'sigma'")
   
+  print(glue("Param selected: {index}))
   
   tempList = list()
   i <- 1
@@ -65,6 +66,8 @@ generate_table <- function(sex, age, param){
       index = 6
     }else stop(glue("Error, please check your adults/pups parameters and try again \n
                Or are you running this on a model with no pups?? Model length is {modelLen}"))
+    
+    print(glue("Index selected: {index}))
     
     # Using above logic choice and model loop, compile the row of data and add it to the list. 
     elem <- as_tibble(allModels_predict[[glue("{model}")]][[index]][tableRow,], rownames = NULL) %>% 
