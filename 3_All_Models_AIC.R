@@ -7,9 +7,10 @@
 library(glue)
 library(tidyverse)
 library(janitor)
-library(xlsx)
+library(readxl)
 library(here)
 library(secr)
+library(fs)
 
 # Clear any environment variables in memory.
 rm(list = ls())
@@ -23,15 +24,17 @@ setwd(here("SRI", "2018", "Adults and pups" ))
 island <- "SRI"
 year <- "2018"
 
-if (island == "SMI"){
-  islandArea <- 3766
-  
-} else if (island == "SRI"){
-  islandArea <- 21553
-}
+island_areas <- tribble(
+  ~island, ~area_km2,
+  "SMI", 3766,
+  "SRI", 21553)
+islandArea <- island_areas %>% 
+  filter(island == !!island) %>% 
+  pull(area_km2)
 
 # Get a list of Rdata files in the specified working directory.
-allFiles <- list.files(path = ".", pattern = "Rdata")
+#allFiles <- list.files(path = ".", pattern = "Rdata")
+allFiles <- list.files(path = "ExampleData", pattern = "Rdata")
 
 # Load all data files into the workspace. 
 for (file in allFiles){
@@ -40,27 +43,24 @@ for (file in allFiles){
   assign(glue("{dataName}"), loadRData(file))
 }
 
-# Create one variable containing a list of all models. 
-allModels <- map(ls(pattern = "Model"), get)
+# rds preferred over rdata b/c explicit value saved and doesn't corrupt namespace with who knows what
+rdatas <- list.files("ExampleData", "Rdata$", full.names=T)
+dir.create("data_rds", showWarnings = F)
+for (rdata in rdatas){ # rdata = rdatas[1]
+  mdl_rds <- file.path("data_rds", path_ext_set(basename(rdata), "rds"))
+  load(rdatas[1])
+  saveRDS(fit, mdl_rds)
+}
 
-# Name the models properly. 
-modelNames <- tools::file_path_sans_ext(allFiles)
-names(allModels) <- modelNames
-
-# Apply the predict function to all models.
-allModels_predict <- purrr::map(allModels, 
-                                ~predict(.x, 
-                                         newdata = NULL, 
-                                         type = c('response','link'), 
-                                         se.fit = TRUE, 
-                                         alpha = .2))
-
-# Generate AIC table. The secrlist finction puts the data into a format that
-# allows it to be entered into a variable. 
-all_AIC_temp <- secrlist(allModels)
-names(all_AIC_temp) <- modelNames
-all_AIC <- AIC(all_AIC_temp)
-
+mdls <- tibble(
+  rds  = list.files("data_rds", "rds$", full.names=T),
+  name = fs::path_ext_remove(basename(rdata)),
+  fit  = map(rds, readRDS),
+  pred = map(
+    fit,
+    predict, 
+    newdata = NULL, type = c('response','link'), se.fit = TRUE, alpha = .2),
+  aic = map(fit, secrlist))
 
 # Set the output to full numbers and not exponents.
 options("scipen"=100, "digits"=4)
@@ -89,7 +89,3 @@ females_pups_D <- generate_table("female", "pup", "D") %>%
 
 males_pups_D <- generate_table("male", "pup", "D") %>% 
   rbind(., as.numeric(.[nrow(.),]) * islandArea)
-
-
-
-
