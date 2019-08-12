@@ -39,7 +39,7 @@ generate_table <- function(sex, age, param){
     tableRow = 3
   } else stop("Error, please select 'D', 'g0', or 'sigma'")
   
-  print(glue("Param selected: {index}))
+  print(glue("Table row selected: {tableRow}"))
   
   tempList = list()
   i <- 1
@@ -67,19 +67,19 @@ generate_table <- function(sex, age, param){
     }else stop(glue("Error, please check your adults/pups parameters and try again \n
                Or are you running this on a model with no pups?? Model length is {modelLen}"))
     
-    print(glue("Index selected: {index}))
+    print(glue("Index selected: {index} Model: {model}"))
     
     # Using above logic choice and model loop, compile the row of data and add it to the list. 
     elem <- as_tibble(allModels_predict[[glue("{model}")]][[index]][tableRow,], rownames = NULL) %>% 
-      select(-link) %>% # remove the link row that nobody needs.
-      mutate(ModelName = model) %>% # put the model name in the table
-      column_to_rownames(var = "ModelName") # turn the model name int the row name.
+      select(-link) %>% # remove the unnecessary link column.
+      mutate(ModelName = model) %>% # insert model name into the table.
+      column_to_rownames(var = "ModelName") # convert model name to row name.
     
-    tempList[[i]] <- elem # add it to your list
+    tempList[[i]] <- elem # add the row to the list.
     i <- i + 1
   }
   
-  # Merge all the data into a single table.
+    # Merge all the data into a single table.
   combined_table <- do.call(rbind, tempList)
   
   # Sort the table with AIC, add model names to the table, and add some needed
@@ -92,7 +92,7 @@ generate_table <- function(sex, age, param){
     mutate(AIC_SE.estimate = SE.estimate * AICcwt) %>% 
     mutate(AIC_lcl = lcl * AICcwt) %>% 
     mutate(AIC_ucl = ucl * AICcwt) %>%  
-    adorn_totals("row") # add a row to the bottom with totals
+    adorn_totals("row") # add a row to the bottom with totals.
   
   return(sorted_table)
   
