@@ -10,6 +10,7 @@ library(janitor)
 library(xlsx)
 library(here)
 library(secr)
+library(fs)
 
 # Clear any environment variables in memory.
 rm(list = ls())
@@ -19,8 +20,8 @@ here()
 source(here("functions.R"))
 
 # Set variables and paths specific to island and year.
-setwd(here("SRI", "2018", "Adults and pups" ))
-island <- "SRI"
+setwd(here("SMI", "2018", "Adult models" ))
+island <- "SMI"
 year <- "2018"
 
 if (island == "SMI"){
@@ -39,6 +40,7 @@ for (file in allFiles){
   print(glue("Loading {dataName} into workspace"))
   assign(glue("{dataName}"), loadRData(file))
 }
+
 
 # Create one variable containing a list of all models. 
 allModels <- map(ls(pattern = "Model"), get)
@@ -82,18 +84,40 @@ write.xlsx(females_sigma,glue("{island}_{year}.xlsx"), sheetName="females_adults
 
 
 # Males 
-males_D <- generate_table("male", "adult", "D") %>% 
+male_D <- generate_table("male", "adult", "D")  %>% 
   rbind(., as.numeric(.[nrow(.),]) * islandArea)
-males_g0 <- generate_table("male", "adult", "g0")
-males_sigma <- generate_table("male", "adult", "sigma") 
+male_D[nrow(male_D),1]<-"*IslandArea" 
+write.xlsx(male_D, glue("{island}_{year}.xlsx"), sheetName="male_adults_D", append=T)
+
+male_g0 <- generate_table("male", "adult", "g0")
+write.xlsx(male_g0,glue("{island}_{year}.xlsx"), sheetName="male_adults_g0", append=T)
+
+male_sigma <- generate_table("male", "adult", "sigma")
+write.xlsx(male_sigma,glue("{island}_{year}.xlsx"), sheetName="male_adults_sigma", append=T)
+
 
 # Pups
-
-females_pups_D <- generate_table("female", "pup", "D") %>% 
+females_D_pups <- generate_table("female", "pup", "D")  %>% 
   rbind(., as.numeric(.[nrow(.),]) * islandArea)
+females_D_pups[nrow(females_D_pups),1]<-"*IslandArea" 
+write.xlsx(females_D_pups, glue("{island}_{year}.xlsx"), sheetName="females_pups_D", append=T)
 
-males_pups_D <- generate_table("male", "pup", "D") %>% 
+females_g0pups <- generate_table("female", "pup", "g0")
+write.xlsx(females_g0,glue("{island}_{year}.xlsx"), sheetName="females_pups_g0", append=T)
+
+females_sigmapups <- generate_table("female", "pup", "sigma")
+write.xlsx(females_sigma,glue("{island}_{year}.xlsx"), sheetName="females_pups_sigma", append=T)
+
+male_D_pups <- generate_table("male", "pup", "D")  %>% 
   rbind(., as.numeric(.[nrow(.),]) * islandArea)
+male_D_pups[nrow(male_D_pups),1]<-"*IslandArea" 
+write.xlsx(male_D_pups, glue("{island}_{year}.xlsx"), sheetName="male_pups_D", append=T)
+
+male_g0_pups <- generate_table("male", "pup", "g0")
+write.xlsx(male_g0,glue("{island}_{year}.xlsx"), sheetName="male_pups_g0", append=T)
+
+male_sigma_pups <- generate_table("male", "pup", "sigma")
+write.xlsx(male_sigma,glue("{island}_{year}.xlsx"), sheetName="male_pups_sigma", append=T)
 
 
 # TODO: Add a for loop to make the tables.  If model == 28, use adults, if model == 112, use pups. 
