@@ -121,7 +121,7 @@ for (row in 1:nrow(formulaList)) {  #for all combos
   # Remove the '+' signs in the file name
   modelNameSave <- gsub("\\+", "_", glue("{modelName}"))
 
-  save(fit, file=glue('{modelNameSave}.Rdata'))
+  saveRDS(fit, file=glue('{modelNameSave}.rds'))
 }
 
 # Disable logging.
