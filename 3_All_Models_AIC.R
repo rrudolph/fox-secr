@@ -20,16 +20,20 @@ here()
 source(here("functions.R"))
 
 # Set variables and paths specific to island and year.
-setwd(here("SMI", "2018", "Adult models" ))
-island <- "SMI"
+setwd(here("SRI", "2018", "Adults new buffer" ))
+island <- "SRI"
 year <- "2018"
 
-if (island == "SMI"){
-  islandArea <- 3766
-  
-} else if (island == "SRI"){
-  islandArea <- 21553
-}
+island_areas <- tribble(
+  ~island, ~area_km2,
+  "SMI", 3766,
+  "SRI", 21553)
+
+# Get island area based on user input from variables
+islandArea <- island_areas %>% 
+  filter(island == !!island) %>% 
+  pull(area_km2)
+
 
 # Get a list of Rdata files in the specified working directory.
 allFiles <- list.files(path = ".", pattern = "Rdata")
