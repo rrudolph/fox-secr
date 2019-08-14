@@ -20,8 +20,8 @@ here()
 source(here("functions.R"))
 
 # Set variables and paths specific to island and year.
-setwd(here("SRI", "2018", "Adults new buffer" ))
-island <- "SRI"
+setwd(here("SMI", "2018"))
+island <- "SMI"
 year <- "2018"
 
 island_areas <- tribble(
@@ -36,13 +36,13 @@ islandArea <- island_areas %>%
 
 
 # Get a list of Rdata files in the specified working directory.
-allFiles <- list.files(path = ".", pattern = "Rdata")
+allFiles <- list.files(path = ".", pattern = "rds")
 
 # Load all data files into the workspace. 
 for (file in allFiles){
   dataName <- tools::file_path_sans_ext(file)
   print(glue("Loading {dataName} into workspace"))
-  assign(glue("{dataName}"), loadRData(file))
+  assign(glue("{dataName}"), readRDS(file))
 }
 
 
@@ -60,6 +60,7 @@ allModels_predict <- purrr::map(allModels,
                                          type = c('response','link'), 
                                          se.fit = TRUE, 
                                          alpha = .2))
+
 
 # Generate AIC table. The secrlist finction puts the data into a format that
 # allows it to be entered into a variable. 

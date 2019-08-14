@@ -22,7 +22,7 @@ setwd(here("SMI", "2018"))
 inputBufferDir <- here("Master Grid Buffers")
 island <- "SMI"
 year <- "2018"
-adultsOnly <- F
+adultsOnly <- T
 
 # Set pixel spacing. 100m for Rosa, 50m for Miguel. 
 if (island == "SMI"){
@@ -48,8 +48,8 @@ formulaList <- formulaList %>%
   mutate(LongName = paste(ModelName, Density, g0, s, sep = "_"))
 
 
-Capthist <- read.capthist(captfile="Capture_File.txt", 
-                          trapfile="Detection_File.txt", 
+Capthist <- read.capthist(captfile="Capture_File-adults.txt", 
+                          trapfile="Detection_File-adults.txt", 
                           detector = "multi", # physical traps
                           fmt="trapID", #  ID field links the two txt input files
                           noccasions=6, # Number of nights of trapping per grid

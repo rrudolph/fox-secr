@@ -30,16 +30,7 @@ sort_with_aic <- function(table){
 generate_table <- function(sex, age, param){
   print(glue("Input criteria: Sex {sex} Age {age} Param {param}"))
   
-  # Set what row to get the data from based on user input
-  if (param == "D"){
-    tableRow = 1
-  }else if (param == "g0"){
-    tableRow = 2
-  }else if (param == "sigma"){
-    tableRow = 3
-  } else stop("Error, please select 'D', 'g0', or 'sigma'")
-  
-  print(glue("Table row selected: {tableRow}"))
+  stopifnot(param %in% c('D', 'g0','sigma'))
   
   tempList = list()
   i <- 1
@@ -70,7 +61,7 @@ generate_table <- function(sex, age, param){
     print(glue("Index selected: {index} Model: {model}"))
     
     # Using above logic choice and model loop, compile the row of data and add it to the list. 
-    elem <- as_tibble(allModels_predict[[glue("{model}")]][[index]][tableRow,], rownames = NULL) %>% 
+    elem <- as_tibble(allModels_predict[[glue("{model}")]][[index]][param,], rownames = NULL) %>% 
       select(-link) %>% # remove the unnecessary link column.
       mutate(ModelName = model) %>% # insert model name into the table.
       column_to_rownames(var = "ModelName") # convert model name to row name.
