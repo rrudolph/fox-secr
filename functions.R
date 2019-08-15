@@ -88,3 +88,90 @@ generate_table <- function(sex, age, param){
   return(sorted_table)
   
 }
+
+export_summary_xls <- function(model){
+  
+  if (length(model) == 28){
+    modelType = "Adults"
+    #Females 
+    females_D <- generate_table("female", "adult", "D")  %>% 
+      rbind(., as.numeric(.[nrow(.),]) * islandArea)
+    females_D[nrow(females_D),1]<-"*IslandArea" 
+    write.xlsx(females_D, glue("{island}_{year}_{modelType}.xlsx"), sheetName="females_adults_D", append=T)
+    
+    females_g0 <- generate_table("female", "adult", "g0")
+    write.xlsx(females_g0,glue("{island}_{year}_{modelType}.xlsx"), sheetName="females_adults_g0", append=T)
+    
+    females_sigma <- generate_table("female", "adult", "sigma")
+    write.xlsx(females_sigma,glue("{island}_{year}_{modelType}.xlsx"), sheetName="females_adults_sigma", append=T)
+    
+    
+    # Males 
+    male_D <- generate_table("male", "adult", "D")  %>% 
+      rbind(., as.numeric(.[nrow(.),]) * islandArea)
+    male_D[nrow(male_D),1]<-"*IslandArea" 
+    write.xlsx(male_D, glue("{island}_{year}_{modelType}.xlsx"), sheetName="male_adults_D", append=T)
+    
+    male_g0 <- generate_table("male", "adult", "g0")
+    write.xlsx(male_g0,glue("{island}_{year}_{modelType}.xlsx"), sheetName="male_adults_g0", append=T)
+    
+    male_sigma <- generate_table("male", "adult", "sigma")
+    write.xlsx(male_sigma,glue("{island}_{year}_{modelType}.xlsx"), sheetName="male_adults_sigma", append=T)
+    
+    
+
+  }else if (length(model) == 112){
+    modelType = "Adults_and_Pups"
+    #Females 
+    females_D <- generate_table("female", "adult", "D")  %>% 
+      rbind(., as.numeric(.[nrow(.),]) * islandArea)
+    females_D[nrow(females_D),1]<-"*IslandArea" 
+    write.xlsx(females_D, glue("{island}_{year}_{modelType}.xlsx"), sheetName="females_adults_D", append=T)
+    
+    females_g0 <- generate_table("female", "adult", "g0")
+    write.xlsx(females_g0,glue("{island}_{year}_{modelType}.xlsx"), sheetName="females_adults_g0", append=T)
+    
+    females_sigma <- generate_table("female", "adult", "sigma")
+    write.xlsx(females_sigma,glue("{island}_{year}_{modelType}.xlsx"), sheetName="females_adults_sigma", append=T)
+    
+    
+    # Males 
+    male_D <- generate_table("male", "adult", "D")  %>% 
+      rbind(., as.numeric(.[nrow(.),]) * islandArea)
+    male_D[nrow(male_D),1]<-"*IslandArea" 
+    write.xlsx(male_D, glue("{island}_{year}_{modelType}.xlsx"), sheetName="male_adults_D", append=T)
+    
+    male_g0 <- generate_table("male", "adult", "g0")
+    write.xlsx(male_g0,glue("{island}_{year}_{modelType}.xlsx"), sheetName="male_adults_g0", append=T)
+    
+    male_sigma <- generate_table("male", "adult", "sigma")
+    write.xlsx(male_sigma,glue("{island}_{year}_{modelType}.xlsx"), sheetName="male_adults_sigma", append=T)
+    
+    
+    # Pups
+    females_D_pups <- generate_table("female", "pup", "D")  %>% 
+      rbind(., as.numeric(.[nrow(.),]) * islandArea)
+    females_D_pups[nrow(females_D_pups),1]<-"*IslandArea" 
+    write.xlsx(females_D_pups, glue("{island}_{year}_{modelType}.xlsx"), sheetName="females_pups_D", append=T)
+    
+    females_g0pups <- generate_table("female", "pup", "g0")
+    write.xlsx(females_g0,glue("{island}_{year}_{modelType}.xlsx"), sheetName="females_pups_g0", append=T)
+    
+    females_sigmapups <- generate_table("female", "pup", "sigma")
+    write.xlsx(females_sigma,glue("{island}_{year}_{modelType}.xlsx"), sheetName="females_pups_sigma", append=T)
+    
+    male_D_pups <- generate_table("male", "pup", "D")  %>% 
+      rbind(., as.numeric(.[nrow(.),]) * islandArea)
+    male_D_pups[nrow(male_D_pups),1]<-"*IslandArea" 
+    write.xlsx(male_D_pups, glue("{island}_{year}_{modelType}.xlsx"), sheetName="male_pups_D", append=T)
+    
+    male_g0_pups <- generate_table("male", "pup", "g0")
+    write.xlsx(male_g0,glue("{island}_{year}_{modelType}.xlsx"), sheetName="male_pups_g0", append=T)
+    
+    male_sigma_pups <- generate_table("male", "pup", "sigma")
+    write.xlsx(male_sigma,glue("{island}_{year}_{modelType}.xlsx"), sheetName="male_pups_sigma", append=T)
+  }else stop("Model length is neither 28 or 112. Check your predict model input and try again.")
+  
+  print(glue("File written: {island}_{year}_{modelType}.xlsx"))
+  
+}

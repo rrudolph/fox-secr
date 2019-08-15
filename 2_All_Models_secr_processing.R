@@ -18,9 +18,9 @@ here()
 rm(list = ls())
 
 # Set variables
-setwd(here("SMI", "2018"))
+setwd(here("SRI", "2018", "test"))
 inputBufferDir <- here("Master Grid Buffers")
-island <- "SMI"
+island <- "SRI"
 year <- "2018"
 adultsOnly <- T
 
@@ -48,8 +48,8 @@ formulaList <- formulaList %>%
   mutate(LongName = paste(ModelName, Density, g0, s, sep = "_"))
 
 
-Capthist <- read.capthist(captfile="Capture_File-adults.txt", 
-                          trapfile="Detection_File-adults.txt", 
+Capthist <- read.capthist(captfile="Capture_File-error.txt", 
+                          trapfile="Detection_File.txt", 
                           detector = "multi", # physical traps
                           fmt="trapID", #  ID field links the two txt input files
                           noccasions=6, # Number of nights of trapping per grid

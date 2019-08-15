@@ -23,10 +23,11 @@ here()
 rm(list = ls())
 
 # Set variables and paths specific to island and year
-setwd(here("SMI", "2018"))
+setwd(here("SRI", "2018"))
+
 island <- "SRI"
 year <- "2018"
-adultsOnly = F
+adultsOnly = T
 
 captures <- read_excel("2018 SRI GRID DATA_3.6.2019 export.xlsx", 
                            col_types = c("text", "numeric", "text", 
@@ -35,10 +36,10 @@ captures <- read_excel("2018 SRI GRID DATA_3.6.2019 export.xlsx",
                                          "text", "text", "text", "text", "text", 
                                          "text", "numeric", "text", "text", 
                                          "text", "text", "text", "skip"))
-
+View(captures)
 
 # captures_sub <- captures %>%
-#   filter(Pittag == 982000363814353 | 
+#   filter(Pittag == 982000363814353 |
 #            Pittag ==982000364301500 |
 #            Pittag == 989001000416330 |
 #            Pittag == 989001000416334 )
@@ -59,7 +60,7 @@ str(captures)
 summary(captures)
 
 
-captures %>%
+missing_data <- captures %>%
   filter(is.na(Datum))
 # found a bogus entry. Remove it.
 captures <- captures %>%
