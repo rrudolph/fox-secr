@@ -20,7 +20,7 @@ loadRData <- function(fileName){
 print_trap_code_list <- function(df_field){
   trapNames <- unique(df_field)
   for (name in trapNames){
-    print(glue('levels(captures$GridCode)[levels(captures$GridCode) == "{name}"] <- ""'))
+    print(glue('"{name}" = "",'))
   }
   
 }

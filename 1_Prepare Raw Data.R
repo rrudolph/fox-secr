@@ -77,31 +77,34 @@ captures$GridCode <- captures$TrapName
 # Shorten those names to a code
 
 # # SMI
-levels(captures$GridCode)[levels(captures$GridCode) == "CARDWELL POINT GRID"] <- "CP"
-levels(captures$GridCode)[levels(captures$GridCode) == "CHARCOAL CANYON GRID"] <- "CC"
-levels(captures$GridCode)[levels(captures$GridCode) == "JACKASS FLATS GRID"] <- "JF"
-levels(captures$GridCode)[levels(captures$GridCode) == "SANDBLAST PASS GRID"] <- "SP"
+captures$GridCode <- recode(captures$GridCode,
+                            "CARDWELL POINT GRID" = "CP",
+                            "CHARCOAL CANYON GRID" = "CC",
+                            "JACKASS FLATS GRID" = "JF",
+                            "SANDBLAST PASS GRID" = "SP")
 
 
 # # SRI
-levels(captures$GridCode)[levels(captures$GridCode) == "Arlington Canyon Grid"] <- "AC"
-levels(captures$GridCode)[levels(captures$GridCode) == "Arlington Springs Grid"] <- "AS"
-levels(captures$GridCode)[levels(captures$GridCode) == "Bee Canyon Grid"] <- "BC"
-levels(captures$GridCode)[levels(captures$GridCode) == "Burma Road Grid"] <- "BR"
-levels(captures$GridCode)[levels(captures$GridCode) == "Carrington Point Grid"] <- "CP"
-levels(captures$GridCode)[levels(captures$GridCode) == "China Camp Grid"] <- "CC"
-levels(captures$GridCode)[levels(captures$GridCode) == "Dry Canyon Grid"] <- "DC"
-levels(captures$GridCode)[levels(captures$GridCode) == "Johnsons Lee Grid"] <- "JL"
-levels(captures$GridCode)[levels(captures$GridCode) == "Lighthouse Road Grid"] <- "LR"
-levels(captures$GridCode)[levels(captures$GridCode) == "Old Ranch Canyon Grid"] <- "OR"
-levels(captures$GridCode)[levels(captures$GridCode) == "Pocket Field Grid"] <- "PF"
-levels(captures$GridCode)[levels(captures$GridCode) == "Quemada Canyon Grid"] <- "QC"
-levels(captures$GridCode)[levels(captures$GridCode) == "Sierra Pablo Grid"] <- "SP"
-levels(captures$GridCode)[levels(captures$GridCode) == "Signal Road Grid"] <- "SR"
-levels(captures$GridCode)[levels(captures$GridCode) == "Telephone Road Grid"] <- "TR"
-levels(captures$GridCode)[levels(captures$GridCode) == "Trancion Canyon Grid"] <- "TC"
-levels(captures$GridCode)[levels(captures$GridCode) == "Verde Canyon Grid"] <- "VC"
-levels(captures$GridCode)[levels(captures$GridCode) == "Wreck Canyon Grid"] <- "WC"
+
+captures$GridCode <- recode(captures$GridCode,
+                            "Arlington Canyon Grid" = "AC",
+                            "Arlington Springs Grid" = "AS",
+                            "Bee Canyon Grid" = "BC",
+                            "Burma Road Grid" = "BR",
+                            "Carrington Point Grid" = "CP",
+                            "China Camp Grid" = "CC",
+                            "Dry Canyon Grid" = "DC",
+                            "Johnsons Lee Grid" = "JL",
+                            "Lighthouse Road Grid" = "LR",
+                            "Old Ranch Canyon Grid" = "OR",
+                            "Pocket Field Grid" = "PF",
+                            "Quemada Canyon Grid" = "QC",
+                            "Sierra Pablo Grid" = "SP",
+                            "Signal Road Grid" = "SR",
+                            "Telephone Road Grid" = "TR",
+                            "Trancion Canyon Grid" = "TC",
+                            "Verde Canyon Grid" = "VC",
+                            "Wreck Canyon Grid" = "WC")
 
 table(captures$GridCode)
 

@@ -100,8 +100,7 @@ dateStamp <- format(Sys.time(), "%Y%m%d")
 sink(glue("log_{island}_{year}_{dateStamp}.txt"), append = T, split = T)
 
 # Using the values of the formulaList data frame, loop through all combinations of models.
-# for (row in 1:nrow(formulaList)) {  #for all combos
-for (row in 1:nrow(formulaList)) {  #for all combos
+for (row in 1:nrow(formulaList)) {  
   modelName <-  formulaList[row, "LongName"]
   Density <- formulaList[row, "Density"]
   group <- formulaList[row, "g0"]
