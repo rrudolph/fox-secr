@@ -16,11 +16,13 @@ library(sf)
 library(rgdal)
 library(rgeos)
 library(here)
-here()
 
 
 # Clear any environment variables in memory
 rm(list = ls())
+
+here()
+source(here("functions.R"))
 
 # Set variables and paths specific to island and year
 setwd(here("SRI", "2018"))
@@ -29,25 +31,14 @@ island <- "SRI"
 year <- "2018"
 adultsOnly = T
 
-captures <- read_excel("2018 SRI GRID DATA_3.6.2019 export.xlsx", 
+captures <- read_excel("2018 SRI GRID DATA_3.6.2019 export.xlsx",
+# captures <- read_excel("2018 SMI GRID DATA_raw.xlsx",
                            col_types = c("text", "numeric", "text", 
                                          "date", "numeric", "numeric", "numeric", 
                                          "numeric", "text", "text", "text", 
                                          "text", "text", "text", "text", "text", 
                                          "text", "numeric", "text", "text", 
                                          "text", "text", "text", "skip"))
-View(captures)
-
-# captures_sub <- captures %>%
-#   filter(Pittag == 982000363814353 |
-#            Pittag ==982000364301500 |
-#            Pittag == 989001000416330 |
-#            Pittag == 989001000416334 )
-# 
-# options("scipen"=100, "digits"=4) 
-# 
-# write.table(captures_sub,"Female foxes.csv", sep="," ,  row.names=F,   quote=F)
-
 
 # Inspect the data as needed
 table(captures$TrapResult)
@@ -56,13 +47,9 @@ table(captures$Sex)
 table(captures$Animal)
 table(captures$SamplingYear)
 table(captures$AgeClass)
-# Get crazy with the table function
 table(captures$TrapResult, captures$Animal)
 
-str(captures)
-summary(captures)
-
-
+# Any missing data?  SRI had a blank entry. 
 captures %>%
   filter(is.na(Datum))
 # found a bogus entry. Remove it.
@@ -80,12 +67,9 @@ fieldList <- c('IslandCode', 'SamplingYear', 'TrapName',  'TrapResult', 'Animal'
 captures[fieldList] <- lapply(captures[fieldList], as.factor)
 
 
-# Get trap names to turn them into short codes. 
+# OPTIONAL: Get trap names to turn them into short codes. 
 # This is a helper function to make writing the codes easier. 
-# trapNames <- unique(captures$TrapName)
-# for (name in trapNames){
-#   print(glue('levels(captures$GridCode)[levels(captures$GridCode) == "{name}"] <- ""'))
-# }
+# print_trap_code_list(captures$TrapName)
 
 # Make a new field called GridCode and populate it with the trap names
 captures$GridCode <- captures$TrapName
@@ -121,6 +105,7 @@ levels(captures$GridCode)[levels(captures$GridCode) == "Wreck Canyon Grid"] <- "
 
 table(captures$GridCode)
 
+# OPTIONAL filtering of certain grids, if needed for testing. 
 # grids_to_use <- c("Carrington Point Grid",
 #                   "Telephone Road Grid",
 #                   "Old Ranch Canyon Grid",
@@ -140,13 +125,6 @@ table(captures$GridCode)
 
 
 # Fix UTMs that are in Zone 11 (mostly an issue on SRI) ----
-
-# To convert to Nad83 UTM Zone 10. EPSG source: http://spatialreference.org/ref/epsg/3157/
-to_nad83z10 <- function(x, y, crs_str){
-  st_as_sf(data_frame(x=x, y=y), crs=crs_str, coords = c("x", "y")) %>%
-    st_transform(crs=3157) %>%
-    st_coordinates()
-}
 
 # Flag records that are in UTM Zone 11
 captures <- captures %>%
@@ -196,7 +174,8 @@ write.table(detection_file$Detection,"Detection_File.txt",
             sep=" ", 
             row.names=F, 
             quote=F, 
-            col.names = glue("#{island} {year} Detection file\n#TrapID UTM_E UTM_N"))
+            col.names = glue("#{island} {year} Detection file\n
+                             #TrapID UTM_E UTM_N"))
 
 
 # Make dataframe of just the ones with Foxes found
@@ -216,7 +195,7 @@ levels(captures_fox$Sex)[levels(captures_fox$Sex) == "Female"] <- "F"
 
 # Make a table of pit tags and NightNumber. Look for anything more than 1. If so, fix.
 multi_grid_per_day <- as.data.frame.matrix(table(captures_fox$Pittag, captures_fox$NightNumber)) %>% 
-  rownames_to_column(var = "rowname") %>%
+  rownames_to_column(var = "Pittag") %>%
   filter_if(is.numeric, any_vars(. > 1)) 
 View(multi_grid_per_day)
 
@@ -227,7 +206,7 @@ multi_grid_fox <- as.data.frame.matrix(table(captures_fox$Pittag, captures_fox$G
 # If there is anything greater than 1 in the MultiTrapped column, then a fox has been to more than one grid
 multi_grid_fox$MultiTrapped <- apply(multi_grid_fox, 1, function(x) sum(x > 0))
 
-# Show those foxes that have spanned multiple traps (zero is good)
+# Show those foxes that have spanned multiple traps (zero rows is good)
 multi_grid_fox %>% 
   rownames_to_column(var="Pittag") %>% 
   filter(MultiTrapped > 1)
@@ -292,7 +271,8 @@ write.table(capture_file$CaptureFile,"Capture_File.txt",
             sep=" ",
             row.names=F, 
             quote=F, 
-            col.names = glue("#{island} {year} Capture file\n#Session FoxID Occasion TrapID Sex"))
+            col.names = glue("#{island} {year} Capture file\n
+                             #Session FoxID Occasion TrapID Sex"))
 
 
 # For convenience, show the issues needing addressing again:

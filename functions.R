@@ -9,10 +9,28 @@
 ###################
 
 # Load .Rdata files by the name of the file.
+# This is only needed for .Rdata files. rds files only need the readRDS function. 
 loadRData <- function(fileName){
   #loads an RData file, and returns it
   load(fileName)
   get(ls()[ls() != "fileName"])
+}
+
+# Print out trap grid codes if needed in script 1. 
+print_trap_code_list <- function(df_field){
+  trapNames <- unique(df_field)
+  for (name in trapNames){
+    print(glue('levels(captures$GridCode)[levels(captures$GridCode) == "{name}"] <- ""'))
+  }
+  
+}
+
+
+# To convert to Nad83 UTM Zone 10. EPSG source: http://spatialreference.org/ref/epsg/3157/
+to_nad83z10 <- function(x, y, crs_str){
+  st_as_sf(data_frame(x=x, y=y), crs=crs_str, coords = c("x", "y")) %>%
+    st_transform(crs=3157) %>%
+    st_coordinates()
 }
 
 # Sort a table with AIC score.
