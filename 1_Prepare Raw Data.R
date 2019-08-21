@@ -57,16 +57,6 @@ captures <- captures %>%
   filter(!is.na(Datum))
 
 
-# Select the fields to be converted to factors
-fieldList <- c('IslandCode', 'SamplingYear', 'TrapName',  'TrapResult', 'Animal',
-                'CaptureType', 'Sex', 'AgeClass', 'Weight_units',
-               'BodyCondition', 'ReproductiveStatus', 'BloodTaken', 'Vaccinations', 'Datum')
-
-
-# Apply as.factor to those fields
-captures[fieldList] <- lapply(captures[fieldList], as.factor)
-
-
 # OPTIONAL: Get trap names to turn them into short codes. 
 # This is a helper function to make writing the codes easier. 
 # print_trap_code_list(captures$TrapName)
@@ -219,16 +209,13 @@ multi_grid_fox %>%
 
 #MANUALLY DELETE OR ALTER THE PIT TAG NUMBERS FROM THE ABOVE OUTPUT
 
-# Convert age class 0-4 to only 0 pup or 1 adult
-captures_fox$AgeClass <- recode(captures_fox$AgeClass,
-                                "2" = "1",
-                                "3" = "1",
-                                "4" = "1")
-
-# Convert age class 0 or 1 to P and A
+# Convert age class 0 to P (pups) and 1, 2, 3, 4 to A (adults)
 captures_fox$AgeClass <- recode(captures_fox$AgeClass,
                                 "0" = "P",
-                                "1" = "A")
+                                "1" = "A",
+                                "2" = "A",
+                                "3" = "A",
+                                "4" = "A")
 
 
 # Check number of pups and adults.
