@@ -76,36 +76,35 @@ captures$GridCode <- captures$TrapName
 
 # Shorten those names to a code
 
-# # SMI
-captures$GridCode <- recode(captures$GridCode,
-                            "CARDWELL POINT GRID" = "CP",
-                            "CHARCOAL CANYON GRID" = "CC",
-                            "JACKASS FLATS GRID" = "JF",
-                            "SANDBLAST PASS GRID" = "SP")
-
-
-# # SRI
-
-captures$GridCode <- recode(captures$GridCode,
-                            "Arlington Canyon Grid" = "AC",
-                            "Arlington Springs Grid" = "AS",
-                            "Bee Canyon Grid" = "BC",
-                            "Burma Road Grid" = "BR",
-                            "Carrington Point Grid" = "CP",
-                            "China Camp Grid" = "CC",
-                            "Dry Canyon Grid" = "DC",
-                            "Johnsons Lee Grid" = "JL",
-                            "Lighthouse Road Grid" = "LR",
-                            "Old Ranch Canyon Grid" = "OR",
-                            "Pocket Field Grid" = "PF",
-                            "Quemada Canyon Grid" = "QC",
-                            "Sierra Pablo Grid" = "SP",
-                            "Signal Road Grid" = "SR",
-                            "Telephone Road Grid" = "TR",
-                            "Trancion Canyon Grid" = "TC",
-                            "Verde Canyon Grid" = "VC",
-                            "Wreck Canyon Grid" = "WC")
-
+if (island == "SMI"){
+  # # SMI
+  captures$GridCode <- recode(captures$GridCode,
+                              "CARDWELL POINT GRID" = "CP",
+                              "CHARCOAL CANYON GRID" = "CC",
+                              "JACKASS FLATS GRID" = "JF",
+                              "SANDBLAST PASS GRID" = "SP")
+}else if (island == "SRI"){
+  captures$GridCode <- recode(captures$GridCode,
+                              "Arlington Canyon Grid" = "AC",
+                              "Arlington Springs Grid" = "AS",
+                              "Bee Canyon Grid" = "BC",
+                              "Burma Road Grid" = "BR",
+                              "Carrington Point Grid" = "CP",
+                              "China Camp Grid" = "CC",
+                              "Dry Canyon Grid" = "DC",
+                              "Johnsons Lee Grid" = "JL",
+                              "Lighthouse Road Grid" = "LR",
+                              "Old Ranch Canyon Grid" = "OR",
+                              "Pocket Field Grid" = "PF",
+                              "Quemada Canyon Grid" = "QC",
+                              "Sierra Pablo Grid" = "SP",
+                              "Signal Road Grid" = "SR",
+                              "Telephone Road Grid" = "TR",
+                              "Trancion Canyon Grid" = "TC",
+                              "Verde Canyon Grid" = "VC",
+                              "Wreck Canyon Grid" = "WC")
+}
+  
 table(captures$GridCode)
 
 # OPTIONAL filtering of certain grids, if needed for testing. 
@@ -190,8 +189,10 @@ table(captures_fox$TrapResult)
 table(captures_fox$Animal)
 
 # Shorten the sex to a code
-levels(captures_fox$Sex)[levels(captures_fox$Sex) == "Male"] <- "M"
-levels(captures_fox$Sex)[levels(captures_fox$Sex) == "Female"] <- "F"
+captures_fox$Sex <- recode(captures_fox$Sex,
+                                "Male" = "M",
+                                "Female" = "F")
+                                
 
 
 # ---- Do some checks for repeat offenders and foxes that have been to more than one grid in a day.
@@ -200,7 +201,8 @@ levels(captures_fox$Sex)[levels(captures_fox$Sex) == "Female"] <- "F"
 multi_grid_per_day <- as.data.frame.matrix(table(captures_fox$Pittag, captures_fox$NightNumber)) %>% 
   rownames_to_column(var = "Pittag") %>%
   filter_if(is.numeric, any_vars(. > 1)) 
-View(multi_grid_per_day)
+
+multi_grid_per_day
 
 
 # Check for any foxes that have been seen in multiple grids.
@@ -218,13 +220,16 @@ multi_grid_fox %>%
 #MANUALLY DELETE OR ALTER THE PIT TAG NUMBERS FROM THE ABOVE OUTPUT
 
 # Convert age class 0-4 to only 0 pup or 1 adult
-levels(captures_fox$AgeClass)[levels(captures_fox$AgeClass) == "2"] <- "1"
-levels(captures_fox$AgeClass)[levels(captures_fox$AgeClass) == "3"] <- "1"
-levels(captures_fox$AgeClass)[levels(captures_fox$AgeClass) == "4"] <- "1"
+captures_fox$AgeClass <- recode(captures_fox$AgeClass,
+                                "2" = "1",
+                                "3" = "1",
+                                "4" = "1")
 
 # Convert age class 0 or 1 to P and A
-levels(captures_fox$AgeClass)[levels(captures_fox$AgeClass) == "0"] <- "P"
-levels(captures_fox$AgeClass)[levels(captures_fox$AgeClass) == "1"] <- "A"
+captures_fox$AgeClass <- recode(captures_fox$AgeClass,
+                                "0" = "P",
+                                "1" = "A")
+
 
 # Check number of pups and adults.
 table(captures_fox$AgeClass)
@@ -283,7 +288,7 @@ write.table(capture_file$CaptureFile,"Capture_File.txt",
 captures_is_na[c("TrapName", "TrapDate", "Pittag", "Sex", "AgeClass")]
 
 # Same fox in the same night number
-View(multi_grid_per_day)
+multi_grid_per_day
 
 # And show foxes that spanned more than one grid
 multi_grid_fox %>% 
