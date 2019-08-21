@@ -56,11 +56,14 @@ table(captures$Sex)
 table(captures$Animal)
 table(captures$SamplingYear)
 table(captures$AgeClass)
+# Get crazy with the table function
+table(captures$TrapResult, captures$Animal)
+
 str(captures)
 summary(captures)
 
 
-missing_data <- captures %>%
+captures %>%
   filter(is.na(Datum))
 # found a bogus entry. Remove it.
 captures <- captures %>%
@@ -162,14 +165,15 @@ captures <- captures %>%
     lon_lat = pmap(list(UTME, UTMN, crs_str), to_nad83z10),
     X_NAD83z10     = map_dbl(lon_lat, ~.[,1]),
     Y_NAD83z10     = map_dbl(lon_lat, ~.[,2])) %>%
-  dplyr::select(-lon_lat)
+  dplyr::select(-lon_lat) %>% 
+  as_tibble()
 
 
 
 # View the data to see if it looks normal. 
 captures_view <- st_as_sf(x = captures, 
                               coords = c("X_NAD83z10", "Y_NAD83z10"),
-                              crs = "+proj=utm +zone=10 +datum=NAD83 +units=m")
+                              crs = "+proj=utm +zone=10 +datum=NAD83 +units=m") 
 
 mapView(captures_view)
 
@@ -188,7 +192,6 @@ detection_file <- captures %>%
 
 
 # Write detection file to disk, no header, no row names
-#TODO: Ask Adam/Laura: Does secr read anything commented? Or totally ignored?
 write.table(detection_file$Detection,"Detection_File.txt",
             sep=" ", 
             row.names=F, 
@@ -212,21 +215,25 @@ levels(captures_fox$Sex)[levels(captures_fox$Sex) == "Female"] <- "F"
 # ---- Do some checks for repeat offenders and foxes that have been to more than one grid in a day.
 
 # Make a table of pit tags and NightNumber. Look for anything more than 1. If so, fix.
-table(captures_fox$Pittag, captures_fox$NightNumber)
-
-# Show number of occurances that are greater than 1. Address these pit tag numbers
-n_occur <- as.data.frame(table(captures_fox$Pittag, captures_fox$NightNumber))
-dplyr::filter(n_occur, Freq > 1)
+multi_grid_per_day <- as.data.frame.matrix(table(captures_fox$Pittag, captures_fox$NightNumber)) %>% 
+  rownames_to_column(var = "rowname") %>%
+  filter_if(is.numeric, any_vars(. > 1)) 
+View(multi_grid_per_day)
 
 
 # Check for any foxes that have been seen in multiple grids.
-multi_grid_fox <- as.data.frame(table(captures_fox$Pittag, captures_fox$GridCode))
-# If there is anything greater than 1 in the TRUE column, then a fox has been to more than one grid
-table(multi_grid_fox$Var1, multi_grid_fox$Freq >0)
+multi_grid_fox <- as.data.frame.matrix(table(captures_fox$Pittag, captures_fox$GridCode))
+
+# If there is anything greater than 1 in the MultiTrapped column, then a fox has been to more than one grid
+multi_grid_fox$MultiTrapped <- apply(multi_grid_fox, 1, function(x) sum(x > 0))
+
+# Show those foxes that have spanned multiple traps (zero is good)
+multi_grid_fox %>% 
+  rownames_to_column(var="Pittag") %>% 
+  filter(MultiTrapped > 1)
 
 
 #MANUALLY DELETE OR ALTER THE PIT TAG NUMBERS FROM THE ABOVE OUTPUT
-
 
 # Convert age class 0-4 to only 0 pup or 1 adult
 levels(captures_fox$AgeClass)[levels(captures_fox$AgeClass) == "2"] <- "1"
@@ -256,6 +263,7 @@ captures_fill <- captures_fox %>%
   fill(Sex, .direction = "down") %>%
   fill(AgeClass, .direction =  "down")
 
+# See how the numbers of each changed after the fill.
 table(captures_fill$AgeClass)
 
 
@@ -292,4 +300,9 @@ write.table(capture_file$CaptureFile,"Capture_File.txt",
 captures_is_na[c("TrapName", "TrapDate", "Pittag", "Sex", "AgeClass")]
 
 # Same fox in the same night number
-dplyr::filter(n_occur, Freq > 1)
+View(multi_grid_per_day)
+
+# And show foxes that spanned more than one grid
+multi_grid_fox %>% 
+  rownames_to_column(var="Pittag") %>% 
+  filter(MultiTrapped > 1)
