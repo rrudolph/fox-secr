@@ -53,12 +53,10 @@ pittag_matrix <- as.data.frame.matrix(table(captures$TrapResult, captures$Pittag
   rownames_to_column(var = "TrapResult") %>%
   filter_if(is.numeric, any_vars(. > 0)) 
 
-# Any missing data?  SRI had a blank entry. 
+# Any missing spatial data?  SRI had a blank entry. 
+# If any exist, it will get removed in the UTM inspection processes
 captures %>%
-  filter(is.na(Datum))
-# found a bogus entry. Remove it.
-captures <- captures %>%
-  filter(!is.na(Datum))
+  filter(is.na(UTME), is.na(UTMN), is.na(Datum)) 
 
 
 ### Generate the grid code ----
@@ -138,10 +136,10 @@ captures <- captures %>%
   filter(!is.na(UTME), !is.na(UTMN), !is.na(Datum)) %>%
   mutate(
     crs_str = glue("+proj=utm +zone={UTM_Zone} +datum={toupper(Datum)} +units=m"),
-    lon_lat = pmap(list(UTME, UTMN, crs_str), to_nad83z10),
-    X_NAD83z10     = map_dbl(lon_lat, ~.[,1]),
-    Y_NAD83z10     = map_dbl(lon_lat, ~.[,2])) %>%
-  dplyr::select(-lon_lat) %>% 
+    utm_convert = pmap(list(UTME, UTMN, crs_str), to_nad83z10),
+    X_NAD83z10     = map_dbl(utm_convert, ~.[,1]),
+    Y_NAD83z10     = map_dbl(utm_convert, ~.[,2])) %>%
+  dplyr::select(-utm_convert, -crs_str) %>%
   as_tibble()
 
 
@@ -214,7 +212,6 @@ captures_fox %>% filter(Sex == "Unknown") %>%
 
 # Fill in Sex and Age Class grouped by pittag
 captures_fill <- captures_fox %>%
-  select(-crs_str) %>% # this "glued" field can cause warnings/errors
   group_by(Pittag) %>%
   fill(Sex, .direction = "up") %>%
   fill(AgeClass, .direction =  "up") %>%
@@ -249,7 +246,7 @@ write.table(capture_file$CaptureFile,"Capture_File.txt",
 # Do some checks for repeat offenders and foxes that have been to more than one grid in a day.
 #  MANUALLY DELETE OR ALTER THE PIT TAG NUMBERS FROM THE BELOW OUTPUT
 
-# Make a table of records that have NA in the Sex or AgeClass columns
+# Make a table of records that have NA in the Sex or AgeClass columns.
 captures_is_na <- captures_fill %>%
   group_by(Pittag) %>%
   filter(is.na(AgeClass) | is.na(Sex))
@@ -258,7 +255,7 @@ captures_is_na <- captures_fill %>%
 captures_is_na[c("TrapName", "TrapDate", "Pittag", "Sex", "AgeClass")]
 
 
-# Make a table of pit tags and NightNumber. Look for anything more than 1. If so, fix.
+# Make a table of pit tags and NightNumber. Look for anything more than 1. If so, fix it in the captures file.
 multi_grid_per_day <- as.data.frame.matrix(table(captures_fill$Pittag, captures_fill$NightNumber)) %>% 
   rownames_to_column(var = "Pittag") %>%
   filter_if(is.numeric, any_vars(. > 1)) 
@@ -269,10 +266,10 @@ multi_grid_per_day
 # Check for any foxes that have been seen in multiple grids.
 multi_grid_fox <- as.data.frame.matrix(table(captures_fill$Pittag, captures_fill$GridCode))
 
-# If there is anything greater than 1 in the MultiTrapped column, then a fox has been to more than one grid
+# If there is anything greater than 1 in the MultiTrapped column, then a fox has been to more than one grid.
 multi_grid_fox$MultiTrapped <- apply(multi_grid_fox, 1, function(x) sum(x > 0))
 
-# Show those foxes that have spanned multiple traps (zero rows is good)
+# Show those foxes that have spanned multiple traps (<0 rows> is good).
 multi_grid_fox %>% 
   rownames_to_column(var="Pittag") %>% 
   filter(MultiTrapped > 1)
