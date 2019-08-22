@@ -1,5 +1,5 @@
 # fox-secr
-Uses secr R package for analysis of fox capture data at Channel Islands National Park.  
+Uses the [secr R package](https://www.otago.ac.nz/density/SECRinR.html) for analysis of fox capture data at Channel Islands National Park.  
 
 ## Script 1
 Imports raw capture data for detailed inspection and UTM coordinate checks. Exports two text files that are needed for secr to run models. Raw data is not provided by this github repo. 
