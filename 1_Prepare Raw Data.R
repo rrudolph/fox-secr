@@ -6,6 +6,7 @@
 #          Adam Dillon, PhD Candidate - Colorado State University
 # Date: 1/30/2019
 
+
 library(readxl)
 library(tidyverse)
 library(glue)
@@ -59,6 +60,8 @@ captures %>%
 captures <- captures %>%
   filter(!is.na(Datum))
 
+
+### Generate the grid code ----
 
 # OPTIONAL: Get trap names to turn them into short codes. 
 # This is a helper function to make writing the codes easier. 
@@ -118,9 +121,9 @@ table(captures$GridCode)
 # captures <- captures %>%
 #   filter(TrapName %in% grids_to_use)
 
+### Inspect the UTM's ----
 
-# Fix UTMs that are in Zone 11 (mostly an issue on SRI) ----
-
+# Fix UTMs that are in Zone 11 (mostly an issue on SRI)
 # Flag records that are in UTM Zone 11
 captures <- captures %>%
   mutate(UTM_Zone = ifelse(UTME < 700000, "11", "10"))
@@ -157,6 +160,8 @@ captures <- unite(captures, TrapID, IslandCode, GridCode, TrapNumber, sep="-", r
 # Take a peak at the data
 captures[c("TrapID", "Pittag", "UTME", "UTMN", "X_NAD83z10", "Y_NAD83z10")]
 
+
+# Write detection file ----
 # Get only distinct Trap ID's and keep the UTM fields, then combine them into one field.
 detection_file <- captures %>%
   select(TrapID, X_NAD83z10, Y_NAD83z10) %>%
@@ -173,7 +178,7 @@ write.table(detection_file$Detection,"Detection_File.txt",
                              #TrapID UTM_E UTM_N"))
 
 
-# Make dataframe of just the ones with Foxes found
+### Filter to only captured foxes ----
 captures_fox <- captures %>%
   filter(TrapResult == "FOX") 
 
@@ -234,6 +239,7 @@ captures_is_na <- captures_fill %>%
 # Show them.  Deal with them as needed. Delete?
 captures_is_na[c("TrapName", "TrapDate", "Pittag", "Sex", "AgeClass")]
 
+### Make a captures file ----
 # Unite the fields to make the txt file needed for secr. 
 ##Session FoxID Occasion TrapID Sex
 capture_file <- captures_fill %>%
@@ -247,9 +253,9 @@ write.table(capture_file$CaptureFile,"Capture_File.txt",
             col.names = glue("#{island} {year} Capture file\n
                              #Session FoxID Occasion TrapID Sex"))
 
-
-# ---- Do some checks for repeat offenders and foxes that have been to more than one grid in a day.
-#      MANUALLY DELETE OR ALTER THE PIT TAG NUMBERS FROM THE BELOW OUTPUT
+### Manual Caputre file inspection ----
+# Do some checks for repeat offenders and foxes that have been to more than one grid in a day.
+#  MANUALLY DELETE OR ALTER THE PIT TAG NUMBERS FROM THE BELOW OUTPUT
 
 # Make a table of pit tags and NightNumber. Look for anything more than 1. If so, fix.
 multi_grid_per_day <- as.data.frame.matrix(table(captures_fill$Pittag, captures_fill$NightNumber)) %>% 
