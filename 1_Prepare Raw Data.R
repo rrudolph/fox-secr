@@ -30,7 +30,7 @@ setwd(here("SRI", "2018"))
 
 island <- "SRI"
 year <- "2018"
-adultsOnly = F
+adultsOnly = T
 
 captures <- read_excel("2018 SRI GRID DATA_3.6.2019 export.xlsx",
 # captures <- read_excel("2018 SMI GRID DATA_raw.xlsx",
@@ -214,6 +214,7 @@ captures_fox %>% filter(Sex == "Unknown") %>%
 
 # Fill in Sex and Age Class grouped by pittag
 captures_fill <- captures_fox %>%
+  select(-crs_str) %>% # this "glued" field can cause warnings/errors
   group_by(Pittag) %>%
   fill(Sex, .direction = "up") %>%
   fill(AgeClass, .direction =  "up") %>%
@@ -231,17 +232,8 @@ if (adultsOnly == T){
 }
   
 
-# Make a table of records that have NA in the Sex or AgeClass columns
-captures_is_na <- captures_fill %>%
-  group_by(Pittag) %>%
-  filter(is.na(AgeClass) | is.na(Sex))
-
-# Show them.  Deal with them as needed. Delete?
-captures_is_na[c("TrapName", "TrapDate", "Pittag", "Sex", "AgeClass")]
-
 ### Make a captures file ----
 # Unite the fields to make the txt file needed for secr. 
-##Session FoxID Occasion TrapID Sex
 capture_file <- captures_fill %>%
   unite(CaptureFile, AgeClass, Pittag, NightNumber, TrapID, Sex, sep=" ", remove=F)
 
@@ -256,6 +248,15 @@ write.table(capture_file$CaptureFile,"Capture_File.txt",
 ### Manual Caputre file inspection ----
 # Do some checks for repeat offenders and foxes that have been to more than one grid in a day.
 #  MANUALLY DELETE OR ALTER THE PIT TAG NUMBERS FROM THE BELOW OUTPUT
+
+# Make a table of records that have NA in the Sex or AgeClass columns
+captures_is_na <- captures_fill %>%
+  group_by(Pittag) %>%
+  filter(is.na(AgeClass) | is.na(Sex))
+
+# Show them.  Deal with them as needed. Delete?
+captures_is_na[c("TrapName", "TrapDate", "Pittag", "Sex", "AgeClass")]
+
 
 # Make a table of pit tags and NightNumber. Look for anything more than 1. If so, fix.
 multi_grid_per_day <- as.data.frame.matrix(table(captures_fill$Pittag, captures_fill$NightNumber)) %>% 
