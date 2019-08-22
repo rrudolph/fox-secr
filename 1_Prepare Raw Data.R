@@ -41,6 +41,8 @@ captures <- read_excel("2018 SRI GRID DATA_3.6.2019 export.xlsx",
                                          "text", "numeric", "text", "text", 
                                          "text", "text", "text", "skip"))
 
+### Take a close look at the data ----
+
 # Inspect the data as needed
 table(captures$TrapResult)
 table(captures$Datum)
@@ -49,6 +51,8 @@ table(captures$Animal)
 table(captures$SamplingYear)
 table(captures$AgeClass)
 table(captures$TrapResult, captures$Animal)
+
+# Look at trap results and pit tags, if desired. 
 pittag_matrix <- as.data.frame.matrix(table(captures$TrapResult, captures$Pittag)) %>% 
   rownames_to_column(var = "TrapResult") %>%
   filter_if(is.numeric, any_vars(. > 0)) 
@@ -202,14 +206,6 @@ captures_fox$AgeClass <- recode(captures_fox$AgeClass,
 # Check number of pups and adults.
 table(captures_fox$AgeClass)
 
-# Check for any "unknown" foxes. Delete them manually if so.
-table(captures_fox$Sex)
-
-# Show which pit tag is marked unknown, if any
-captures_fox %>% filter(Sex == "Unknown") %>% 
-  select(Pittag, Sex, AgeClass)
-
-
 # Fill in Sex and Age Class grouped by pittag
 captures_fill <- captures_fox %>%
   group_by(Pittag) %>%
@@ -242,17 +238,21 @@ write.table(capture_file$CaptureFile,"Capture_File.txt",
             col.names = glue("#{island} {year} Capture file\n
                              #Session FoxID Occasion TrapID Sex"))
 
-### Manual Caputre file inspection ----
+### Manual Capture file inspection ----
 # Do some checks for repeat offenders and foxes that have been to more than one grid in a day.
-#  MANUALLY DELETE OR ALTER THE PIT TAG NUMBERS FROM THE BELOW OUTPUT
+#  MANUALLY DELETE OR ALTER THE PIT TAG ENTRIES FROM THE BELOW OUTPUT
 
-# Make a table of records that have NA in the Sex or AgeClass columns.
-captures_is_na <- captures_fill %>%
+
+# Show which pit tag is marked unknown, if any. Delete? Guess the sex?
+captures_fill %>% filter(Sex == "Unknown") %>% 
+  select(Pittag, Sex, AgeClass)
+
+
+# Show ecords that have NA in the Sex or AgeClass columns.Delete?
+captures_fill %>%
   group_by(Pittag) %>%
-  filter(is.na(AgeClass) | is.na(Sex))
-
-# Show them.  Deal with them as needed. Delete?
-captures_is_na[c("TrapName", "TrapDate", "Pittag", "Sex", "AgeClass")]
+  filter(is.na(AgeClass) | is.na(Sex)) %>% 
+  select(TrapName, TrapDate, Pittag, Sex, AgeClass)
 
 
 # Make a table of pit tags and NightNumber. Look for anything more than 1. If so, fix it in the captures file.
