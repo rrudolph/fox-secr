@@ -2,7 +2,7 @@
 Uses the [secr R package](https://www.otago.ac.nz/density/SECRinR.html) for analysis of fox capture data at Channel Islands National Park to estimate population numbers.   
 
 ## Script 1
-Imports raw capture data for detailed inspection and UTM coordinate checks. Exports two text files that are needed for secr to run models. Raw data is not provided by this github repo. 
+Imports raw capture data for detailed inspection and UTM coordinate checks. Exports two text files that are needed for secr to run models that adhere to the [data input requirements of secr](https://www.otago.ac.nz/density/pdfs/secr-datainput.pdf). Raw data is not provided by this github repo. 
 
 ## Script 2
 Uses the text files from script 1 as input. Needs 900 m buffer around grids which can be found in Master Grid Buffers folder.
