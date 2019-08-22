@@ -29,7 +29,7 @@ setwd(here("SRI", "2018"))
 
 island <- "SRI"
 year <- "2018"
-adultsOnly = T
+adultsOnly = F
 
 captures <- read_excel("2018 SRI GRID DATA_3.6.2019 export.xlsx",
 # captures <- read_excel("2018 SMI GRID DATA_raw.xlsx",
@@ -48,6 +48,9 @@ table(captures$Animal)
 table(captures$SamplingYear)
 table(captures$AgeClass)
 table(captures$TrapResult, captures$Animal)
+pittag_matrix <- as.data.frame.matrix(table(captures$TrapResult, captures$Pittag)) %>% 
+  rownames_to_column(var = "TrapResult") %>%
+  filter_if(is.numeric, any_vars(. > 0)) 
 
 # Any missing data?  SRI had a blank entry. 
 captures %>%
@@ -184,31 +187,6 @@ captures_fox$Sex <- recode(captures_fox$Sex,
                                 "Female" = "F")
                                 
 
-
-# ---- Do some checks for repeat offenders and foxes that have been to more than one grid in a day.
-
-# Make a table of pit tags and NightNumber. Look for anything more than 1. If so, fix.
-multi_grid_per_day <- as.data.frame.matrix(table(captures_fox$Pittag, captures_fox$NightNumber)) %>% 
-  rownames_to_column(var = "Pittag") %>%
-  filter_if(is.numeric, any_vars(. > 1)) 
-
-multi_grid_per_day
-
-
-# Check for any foxes that have been seen in multiple grids.
-multi_grid_fox <- as.data.frame.matrix(table(captures_fox$Pittag, captures_fox$GridCode))
-
-# If there is anything greater than 1 in the MultiTrapped column, then a fox has been to more than one grid
-multi_grid_fox$MultiTrapped <- apply(multi_grid_fox, 1, function(x) sum(x > 0))
-
-# Show those foxes that have spanned multiple traps (zero rows is good)
-multi_grid_fox %>% 
-  rownames_to_column(var="Pittag") %>% 
-  filter(MultiTrapped > 1)
-
-
-#MANUALLY DELETE OR ALTER THE PIT TAG NUMBERS FROM THE ABOVE OUTPUT
-
 # Convert age class 0 to P (pups) and 1, 2, 3, 4 to A (adults)
 captures_fox$AgeClass <- recode(captures_fox$AgeClass,
                                 "0" = "P",
@@ -241,7 +219,7 @@ captures_fill <- captures_fox %>%
 table(captures_fill$AgeClass)
 
 
-# Only keep the adults if specified above
+# Only keep the adults if specified at the top of the script
 if (adultsOnly == T){
   captures_fill <- captures_fill %>%
     filter(AgeClass == "A")
@@ -270,14 +248,24 @@ write.table(capture_file$CaptureFile,"Capture_File.txt",
                              #Session FoxID Occasion TrapID Sex"))
 
 
-# For convenience, show the issues needing addressing again:
-#Any foxes with NA sex
-captures_is_na[c("TrapName", "TrapDate", "Pittag", "Sex", "AgeClass")]
+# ---- Do some checks for repeat offenders and foxes that have been to more than one grid in a day.
+#      MANUALLY DELETE OR ALTER THE PIT TAG NUMBERS FROM THE BELOW OUTPUT
 
-# Same fox in the same night number
+# Make a table of pit tags and NightNumber. Look for anything more than 1. If so, fix.
+multi_grid_per_day <- as.data.frame.matrix(table(captures_fill$Pittag, captures_fill$NightNumber)) %>% 
+  rownames_to_column(var = "Pittag") %>%
+  filter_if(is.numeric, any_vars(. > 1)) 
+
 multi_grid_per_day
 
-# And show foxes that spanned more than one grid
+
+# Check for any foxes that have been seen in multiple grids.
+multi_grid_fox <- as.data.frame.matrix(table(captures_fill$Pittag, captures_fill$GridCode))
+
+# If there is anything greater than 1 in the MultiTrapped column, then a fox has been to more than one grid
+multi_grid_fox$MultiTrapped <- apply(multi_grid_fox, 1, function(x) sum(x > 0))
+
+# Show those foxes that have spanned multiple traps (zero rows is good)
 multi_grid_fox %>% 
   rownames_to_column(var="Pittag") %>% 
   filter(MultiTrapped > 1)

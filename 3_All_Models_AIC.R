@@ -20,7 +20,7 @@ here()
 source(here("functions.R"))
 
 # Set variables and paths specific to island and year.
-setwd(here("SRI", "2018", "Adults and Pups"))
+setwd(here("SRI", "2018", "Adults new buffer"))
 island <- "SRI"
 year <- "2018"
 

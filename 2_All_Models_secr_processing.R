@@ -18,7 +18,7 @@ here()
 rm(list = ls())
 
 # Set variables
-setwd(here("SRI", "2018", "test"))
+setwd(here("SRI", "2018"))
 inputBufferDir <- here("Master Grid Buffers")
 island <- "SRI"
 year <- "2018"
@@ -48,7 +48,7 @@ formulaList <- formulaList %>%
   mutate(LongName = paste(ModelName, Density, g0, s, sep = "_"))
 
 
-Capthist <- read.capthist(captfile="Capture_File-error.txt", 
+Capthist <- read.capthist(captfile="Capture_File.txt", 
                           trapfile="Detection_File.txt", 
                           detector = "multi", # physical traps
                           fmt="trapID", #  ID field links the two txt input files
@@ -59,6 +59,7 @@ Capthist <- read.capthist(captfile="Capture_File-error.txt",
 par(mar = c(1,1,1,1)) # reduce margins
 plot(Capthist, tracks = T)
 summary(Capthist)
+
 m <- unlist(moves(Capthist))
 hist(m,  xlab = "Movement m", main = "")
 plot(ecdf(m))
