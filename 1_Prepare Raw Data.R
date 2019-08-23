@@ -23,6 +23,7 @@ library(here)
 rm(list = ls())
 
 here()
+# Bring in the custom functions
 source(here("functions.R"))
 
 # Set variables and paths specific to island and year
@@ -44,24 +45,20 @@ captures <- read_excel("2018 SRI GRID DATA_3.6.2019 export.xlsx",
 ### Take a close look at the data ----
 
 # Inspect the data as needed
-table(captures$TrapResult)
-table(captures$Datum)
-table(captures$Sex)
-table(captures$Animal)
-table(captures$SamplingYear)
-table(captures$AgeClass)
-table(captures$TrapResult, captures$Animal)
+table(captures$TrapResult, useNA = "always")
+table(captures$Datum, useNA = "always")
+table(captures$Sex, useNA = "always")
+table(captures$Animal, useNA = "always")
+table(captures$SamplingYear, useNA = "always")
+table(captures$AgeClass, useNA = "always")
 
-# Look at trap results and pit tags, if desired. 
-pittag_matrix <- as.data.frame.matrix(table(captures$TrapResult, captures$Pittag)) %>% 
-  rownames_to_column(var = "TrapResult") %>%
-  filter_if(is.numeric, any_vars(. > 0)) 
+table(captures$TrapResult, captures$Animal, useNA = "always")
+
 
 # Any missing spatial data?  SRI had a blank entry. 
 # If any exist, it will get removed in the UTM inspection processes
 captures %>%
   filter(is.na(UTME), is.na(UTMN), is.na(Datum)) 
-
 
 ### Generate the grid code ----
 
@@ -101,6 +98,8 @@ if (island == "SMI"){
                               "Trancion Canyon Grid" = "TC",
                               "Verde Canyon Grid" = "VC",
                               "Wreck Canyon Grid" = "WC")
+}else {
+  stop("The island variable only accepts 'SMI' or 'SRI'")  
 }
   
 table(captures$GridCode)
@@ -148,11 +147,12 @@ captures <- captures %>%
 
 
 
-# View the data to see if it looks normal. 
+# Put the data into a format so mapView can display it. 
 captures_view <- st_as_sf(x = captures, 
                               coords = c("X_NAD83z10", "Y_NAD83z10"),
                               crs = "+proj=utm +zone=10 +datum=NAD83 +units=m") 
 
+# View the data to see if it looks normal. 
 mapView(captures_view)
 
 
@@ -240,7 +240,7 @@ write.table(capture_file$CaptureFile,"Capture_File.txt",
 
 ### Manual Capture file inspection ----
 # Do some checks for repeat offenders and foxes that have been to more than one grid in a day.
-#  MANUALLY DELETE OR ALTER THE PIT TAG ENTRIES FROM THE BELOW OUTPUT
+# MANUALLY DELETE OR ALTER THE PIT TAG ENTRIES FROM THE BELOW OUTPUT
 
 
 # Show which pit tag is marked unknown, if any. Delete? Guess the sex?
@@ -248,7 +248,7 @@ captures_fill %>% filter(Sex == "Unknown") %>%
   select(Pittag, Sex, AgeClass)
 
 
-# Show ecords that have NA in the Sex or AgeClass columns.Delete?
+# Show records that have NA in the Sex or AgeClass columns. Delete? Guess the sex?
 captures_fill %>%
   group_by(Pittag) %>%
   filter(is.na(AgeClass) | is.na(Sex)) %>% 
@@ -269,7 +269,7 @@ multi_grid_fox <- as.data.frame.matrix(table(captures_fill$Pittag, captures_fill
 # If there is anything greater than 1 in the MultiTrapped column, then a fox has been to more than one grid.
 multi_grid_fox$MultiTrapped <- apply(multi_grid_fox, 1, function(x) sum(x > 0))
 
-# Show those foxes that have spanned multiple traps (<0 rows> is good).
+# Show those foxes that have spanned multiple traps (<0 rows> is good and means they only stay in one grid).
 multi_grid_fox %>% 
   rownames_to_column(var="Pittag") %>% 
   filter(MultiTrapped > 1)
