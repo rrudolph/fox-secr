@@ -107,6 +107,8 @@ generate_table <- function(sex, age, param){
   
 }
 
+# Export an excel spreadsheet based on inputs.  
+# If Density is the input, add the island area calculation at the bottom of the table. 
 write_table <- function(sex, age, param){
   temp <- generate_table(sex, age, param) 
   if (param == "D"){

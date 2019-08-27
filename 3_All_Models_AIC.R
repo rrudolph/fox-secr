@@ -94,7 +94,7 @@ for (row in 1:nrow(param_matrix)){
   sex <- param_matrix[row, 1]
   age <- param_matrix[row, 2]
   param <- param_matrix[row, 3]
-  print(glue("{sex}_{age}_{param}"))
+  print(glue("Writing table for {sex}_{age}_{param}"))
   write_table(sex, age, param)
   
 }
