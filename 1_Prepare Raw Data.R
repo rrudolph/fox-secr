@@ -185,8 +185,8 @@ captures_fox <- captures %>%
   filter(TrapResult == "FOX") 
 
 # Inspect the fox only table just for fun
-table(captures_fox$TrapResult)
-table(captures_fox$Animal)
+table(captures_fox$TrapResult, useNA = "always")
+table(captures_fox$Animal, useNA = "always")
 
 # Shorten the sex to a code
 captures_fox$Sex <- recode(captures_fox$Sex,
@@ -204,7 +204,7 @@ captures_fox$AgeClass <- recode(captures_fox$AgeClass,
 
 
 # Check number of pups and adults.
-table(captures_fox$AgeClass)
+table(captures_fox$AgeClass, useNA = "always")
 
 # Fill in Sex and Age Class grouped by pittag
 captures_fill <- captures_fox %>%
@@ -215,7 +215,7 @@ captures_fill <- captures_fox %>%
   fill(AgeClass, .direction =  "down")
 
 # See how the numbers of each changed after the fill.
-table(captures_fill$AgeClass)
+table(captures_fill$AgeClass, useNA = "always")
 
 
 # Only keep the adults if specified at the top of the script
@@ -260,8 +260,8 @@ multi_grid_per_day <- as.data.frame.matrix(table(captures_fill$Pittag, captures_
   rownames_to_column(var = "Pittag") %>%
   filter_if(is.numeric, any_vars(. > 1)) 
 
+# Display it.
 multi_grid_per_day
-
 
 # Check for any foxes that have been seen in multiple grids.
 multi_grid_fox <- as.data.frame.matrix(table(captures_fill$Pittag, captures_fill$GridCode))

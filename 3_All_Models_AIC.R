@@ -20,7 +20,7 @@ here()
 source(here("functions.R"))
 
 # Set variables and paths specific to island and year.
-setwd(here("SRI", "2018", "Adults new buffer"))
+setwd(here("SRI", "2018", "Adults and pups"))
 island <- "SRI"
 year <- "2018"
 
@@ -72,6 +72,30 @@ all_AIC <- AIC(all_AIC_temp)
 # Set the output to full numbers and not exponents.
 options("scipen"=100, "digits"=4)
 
-export_summary_xls(allModels_predict)
+# Sex and params are the same for both pups and adults.
+sex <- c("male", "female")
+param <- c("D", "g0", "sigma")
 
+# Get the length of the models to determin if it includes pups.
+modelLength <- length(allModels_predict)
+
+# Include pups if the 112 model. Use expand.grid to make a matrix of inputs.
+if (modelLength == 28){
+  age <- c("adult")
+  param_matrix <- as.data.frame.matrix(expand.grid(sex, age, param))
+} else if (modelLength == 112){
+  age <- c("adult", "pup")
+  param_matrix <- as.data.frame.matrix(expand.grid(sex, age, param))
+}
+
+# Get elements from the parameter matrix generate above. 
+# For each one run the write_table function to make an excel output.
+for (row in 1:nrow(param_matrix)){
+  sex <- param_matrix[row, 1]
+  age <- param_matrix[row, 2]
+  param <- param_matrix[row, 3]
+  print(glue("{sex}_{age}_{param}"))
+  write_table(sex, age, param)
+  
+}
 
