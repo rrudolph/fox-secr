@@ -1,3 +1,5 @@
+# This is for testing the new computer to see how it performs when running with multicore support. 
+
 for (row in 1:nrow(formulaList)) {  
   modelName <-  formulaList[row, "LongName"]
   Density <- formulaList[row, "Density"]
