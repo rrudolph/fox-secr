@@ -20,7 +20,7 @@ here()
 source(here("functions.R"))
 
 # Set variables and paths specific to island and year.
-setwd(here("SRI", "2018", "Adults and pups"))
+setwd(here("SRI", "2018", "Adults and Pups"))
 island <- "SRI"
 year <- "2018"
 
@@ -88,6 +88,7 @@ if (modelLength == 28){
   param_matrix <- as.data.frame.matrix(expand.grid(sex, age, param))
 }
 
+
 # Get elements from the parameter matrix generate above. 
 # For each one run the write_table function to make an excel output.
 for (row in 1:nrow(param_matrix)){
@@ -98,4 +99,5 @@ for (row in 1:nrow(param_matrix)){
   write_table(sex, age, param)
   
 }
+
 

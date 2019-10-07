@@ -265,6 +265,7 @@ multi_grid_per_day
 
 # Check for any foxes that have been seen in multiple grids.
 multi_grid_fox <- as.data.frame.matrix(table(captures_fill$Pittag, captures_fill$GridCode))
+multi_grid_fox[4,1] <- 10 # Test it to show it works
 
 # If there is anything greater than 1 in the MultiTrapped column, then a fox has been to more than one grid.
 multi_grid_fox$MultiTrapped <- apply(multi_grid_fox, 1, function(x) sum(x > 0))

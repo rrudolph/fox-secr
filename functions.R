@@ -67,11 +67,11 @@ generate_table <- function(sex, age, param){
       index = 2
     }else if (age == "pup" & sex == "female" & modelLen == 4){
       index = 3
-    }else if (age == "pup" & sex == "male" & modelLen == 4){
+    }else if (age == "pup" & sex == "male"   & modelLen == 4){
       index = 4
     }else if (age == "pup" & sex == "female" & modelLen > 4){
       index = 5
-    }else if (age == "pup" & sex == "male" & modelLen > 4){
+    }else if (age == "pup" & sex == "male"   & modelLen > 4){
       index = 6
     }else stop(glue("Error, please check your adults/pups parameters and try again \n
                Or are you running this on a model with no pups?? Model length is {modelLen}"))
@@ -79,12 +79,12 @@ generate_table <- function(sex, age, param){
     print(glue("Index selected: {index} Model: {model}"))
     
     # Using above logic choice and model loop, compile the row of data and add it to the list. 
-    elem <- as_tibble(allModels_predict[[glue("{model}")]][[index]][param,], rownames = NULL) %>% 
+    selectedRow <- as_tibble(allModels_predict[[glue("{model}")]][[index]][param,], rownames = NULL) %>% 
       select(-link) %>% # remove the unnecessary link column.
       mutate(ModelName = model) %>% # insert model name into the table.
       column_to_rownames(var = "ModelName") # convert model name to row name.
     
-    tempList[[i]] <- elem # add the row to the list.
+    tempList[[i]] <- selectedRow # add the row to the list.
     i <- i + 1
   }
   
