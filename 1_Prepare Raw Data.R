@@ -1,4 +1,4 @@
-# Purpose: To process raw data from Channel Islands National Park Island Fox capture database 
+# Purpose: To process raw data from Channel Islands National Park Island Fox capture database
 # into a format that the secr package can read. Output files are "Detection_File.txt" and
 # "Capture_File.txt". The Catpure file will need to be modified slightly to account for any
 # double captures or other issues that this script will help to detect.
@@ -27,14 +27,14 @@ here()
 source(here("functions.R"))
 
 # Set variables and paths specific to island and year
-setwd(here("SRI", "2018"))
+island <- "SMI"
+year <- "2019"
 
-island <- "SRI"
-year <- "2018"
+setwd(here(island, year))
 adultsOnly = T
 
-captures <- read_excel("2018 SRI GRID DATA_3.6.2019 export.xlsx",
-# captures <- read_excel("2018 SMI GRID DATA_raw.xlsx",
+# captures <- read_excel("2018 SRI GRID DATA_3.6.2019 export.xlsx",
+captures <- read_excel("2019 SMI FOX GRID DATA_10.8.2019 export.xlsx",
                            col_types = c("text", "numeric", "text", 
                                          "date", "numeric", "numeric", "numeric", 
                                          "numeric", "text", "text", "text", 
@@ -46,7 +46,7 @@ captures <- read_excel("2018 SRI GRID DATA_3.6.2019 export.xlsx",
 
 # Inspect the data as needed
 table(captures$TrapResult, useNA = "always")
-table(captures$Datum, useNA = "always")
+table(captures$Datum, useNA = 'always')
 table(captures$Sex, useNA = "always")
 table(captures$Animal, useNA = "always")
 table(captures$SamplingYear, useNA = "always")
@@ -60,11 +60,16 @@ table(captures$TrapResult, captures$Animal, useNA = "always")
 captures %>%
   filter(is.na(UTME), is.na(UTMN), is.na(Datum)) 
 
+
+
 ### Generate the grid code ----
 
 # OPTIONAL: Get trap names to turn them into short codes. 
 # This is a helper function to make writing the codes easier. 
 # print_trap_code_list(captures$TrapName)
+
+# Any issues with the trap names?
+table(captures$TrapName)
 
 # Make a new field called GridCode and populate it with the trap names
 captures$GridCode <- captures$TrapName
@@ -248,24 +253,24 @@ captures_fill %>% filter(Sex == "Unknown") %>%
   select(Pittag, Sex, AgeClass)
 
 
-# Show records that have NA in the Sex or AgeClass columns. Delete? Guess the sex?
-captures_fill %>%
+# Show records that have NA in the Sex or AgeClass columns. Delete? Guess the sex or age?
+age_na <- captures_fill %>%
   group_by(Pittag) %>%
   filter(is.na(AgeClass) | is.na(Sex)) %>% 
   select(TrapName, TrapDate, Pittag, Sex, AgeClass)
 
 
 # Make a table of pit tags and NightNumber. Look for anything more than 1. If so, fix it in the captures file.
-multi_grid_per_day <- as.data.frame.matrix(table(captures_fill$Pittag, captures_fill$NightNumber)) %>% 
+multi_captures_per_day <- as.data.frame.matrix(table(captures_fill$Pittag, captures_fill$NightNumber)) %>% 
   rownames_to_column(var = "Pittag") %>%
   filter_if(is.numeric, any_vars(. > 1)) 
 
 # Display it.
-multi_grid_per_day
+multi_captures_per_day 
 
 # Check for any foxes that have been seen in multiple grids.
 multi_grid_fox <- as.data.frame.matrix(table(captures_fill$Pittag, captures_fill$GridCode))
-multi_grid_fox[4,1] <- 10 # Test it to show it works
+# multi_grid_fox[4,1] <- 10 # Test it to show it works
 
 # If there is anything greater than 1 in the MultiTrapped column, then a fox has been to more than one grid.
 multi_grid_fox$MultiTrapped <- apply(multi_grid_fox, 1, function(x) sum(x > 0))
@@ -274,3 +279,4 @@ multi_grid_fox$MultiTrapped <- apply(multi_grid_fox, 1, function(x) sum(x > 0))
 multi_grid_fox %>% 
   rownames_to_column(var="Pittag") %>% 
   filter(MultiTrapped > 1)
+

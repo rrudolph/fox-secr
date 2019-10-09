@@ -18,11 +18,12 @@ here()
 rm(list = ls())
 
 # Set variables
-setwd(here("SRI", "2018"))
+island <- "SMI"
+year <- "2019"
+setwd(here(island, year))
 inputBufferDir <- here("Master Grid Buffers")
-island <- "SRI"
-year <- "2018"
-adultsOnly <- T
+
+adultsOnly <- F
 
 # Set pixel spacing. 100m for Rosa, 50m for Miguel. 
 if (island == "SMI"){
@@ -78,7 +79,7 @@ if (adultsOnly == T){
                     type = "polygon",
                     poly = Polygon)
 } else {
-  print("Selected Pups Mask Version")
+  print("Selected Adults and Pups Mask Version")
   Mask <- make.mask(traps(Capthist), 
                     spacing = pixelSpacing,
                     session=c(1,1),

@@ -10,7 +10,7 @@ library(janitor)
 library(xlsx)
 library(here)
 library(secr)
-library(fs)
+
 
 # Clear any environment variables in memory.
 rm(list = ls())
@@ -20,9 +20,9 @@ here()
 source(here("functions.R"))
 
 # Set variables and paths specific to island and year.
-setwd(here("SRI", "2018", "Adults and Pups"))
-island <- "SRI"
-year <- "2018"
+island <- "SMI"
+year <- "2019"
+setwd(here(island, year, "First run"))
 
 island_areas <- tribble(
   ~island, ~area_km2,
@@ -36,13 +36,13 @@ islandArea <- island_areas %>%
 
 
 # Get a list of Rdata files in the specified working directory.
-allFiles <- list.files(path = ".", pattern = "Rdata")
+allFiles <- list.files(path = ".", pattern = "rds") # change patteren if .rds or .Rdata
 
 # Load all data files into the workspace. 
 for (file in allFiles){
   dataName <- tools::file_path_sans_ext(file)
   print(glue("Loading {dataName} into workspace"))
-  assign(glue("{dataName}"), loadRData(file))
+  assign(glue("{dataName}"), readRDS(file)) # loadRData() function for .Rdata files, readRDS() for .rds files.
 }
 
 
