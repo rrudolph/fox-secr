@@ -34,7 +34,7 @@ setwd(here(island, year))
 adultsOnly = T
 
 # captures <- read_excel("2018 SRI GRID DATA_3.6.2019 export.xlsx",
-captures <- read_excel("2019 SMI FOX GRID DATA_10.8.2019 export.xlsx",
+captures <- read_excel("2019 SMI FOX GRID DATA_10.9.2019 export.xlsx",
                            col_types = c("text", "numeric", "text", 
                                          "date", "numeric", "numeric", "numeric", 
                                          "numeric", "text", "text", "text", 
@@ -53,6 +53,7 @@ table(captures$SamplingYear, useNA = "always")
 table(captures$AgeClass, useNA = "always")
 
 table(captures$TrapResult, captures$Animal, useNA = "always")
+
 
 
 # Any missing spatial data?  SRI had a blank entry. 
@@ -236,7 +237,7 @@ capture_file <- captures_fill %>%
   unite(CaptureFile, AgeClass, Pittag, NightNumber, TrapID, Sex, sep=" ", remove=F)
 
 # Write capture file to disk
-write.table(capture_file$CaptureFile,"Capture_File.txt",
+write.table(capture_file$CaptureFile,"Capture_File_adults_only.txt",
             sep=" ",
             row.names=F, 
             quote=F, 

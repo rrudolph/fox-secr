@@ -56,9 +56,9 @@ generate_table <- function(sex, age, param){
   # of the master list of data. 
   for (model in modelNames) {
     
-    modelLen <- length(allModels_predict[[glue("{model}")]])
-    
-    # Use logic to get the correct data. If the models include pups,
+    modelLen <- length(allModels_80percent[[glue("{model}")]])
+
+    # Use logic to  get the correct data. If the models include pups,
     # some will have 8 sets of data, so any model that has more than 4
     # lists will need to be able to select the correct row based on user input. 
     if (age == "adult" & sex == "female") {
@@ -79,8 +79,8 @@ generate_table <- function(sex, age, param){
     print(glue("Index selected: {index} Model: {model}"))
     
     # Using above logic choice and model loop, compile the row of data and add it to the list. 
-    selectedRow <- as_tibble(allModels_predict[[glue("{model}")]][[index]][param,], rownames = NULL) %>% 
-      select(-link) %>% # remove the unnecessary link column.
+    selectedRow <- as_tibble(allModels_80percent[[glue("{model}")]][[index]][param,], rownames = NULL) %>% 
+       select(-link) %>% # remove the unnecessary link column.
       mutate(ModelName = model) %>% # insert model name into the table.
       column_to_rownames(var = "ModelName") # convert model name to row name.
     
@@ -97,10 +97,10 @@ generate_table <- function(sex, age, param){
     sort_with_aic() %>%
     rownames_to_column('ModelName') %>%
     mutate(AICcwt = all_AIC[ ,8]) %>% 
-    mutate(AIC_estimate = estimate * AICcwt) %>% 
-    mutate(AIC_SE.estimate = SE.estimate * AICcwt) %>% 
-    mutate(AIC_lcl = lcl * AICcwt) %>% 
-    mutate(AIC_ucl = ucl * AICcwt) %>%  
+    mutate(ModelAveraged_estimate = estimate * AICcwt) %>% 
+    mutate(ModelAveraged_SE.estimate = SE.estimate * AICcwt) %>% 
+    mutate(ModelAveraged_lcl = lcl * AICcwt) %>% 
+    mutate(ModelAveraged_ucl = ucl * AICcwt) %>%  
     adorn_totals("row") # add a row to the bottom with totals.
   
   return(sorted_table)

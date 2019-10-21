@@ -23,7 +23,7 @@ year <- "2019"
 setwd(here(island, year))
 inputBufferDir <- here("Master Grid Buffers")
 
-adultsOnly <- F
+adultsOnly <- T
 
 # Set pixel spacing. 100m for Rosa, 50m for Miguel. 
 if (island == "SMI"){
@@ -49,7 +49,7 @@ formulaList <- formulaList %>%
   mutate(LongName = paste(ModelName, Density, g0, s, sep = "_"))
 
 
-Capthist <- read.capthist(captfile="Capture_File.txt", 
+Capthist <- read.capthist(captfile="Capture_File_adults_only.txt", 
                           trapfile="Detection_File.txt", 
                           detector = "multi", # physical traps
                           fmt="trapID", #  ID field links the two txt input files
@@ -101,16 +101,20 @@ summary(Mask)
 dateStamp <- format(Sys.time(), "%Y%m%d")
 sink(glue("log_{island}_{year}_{dateStamp}.txt"), append = T, split = T)
 
+# h2 is modeling sex, males females, but can be any two groups. 
+
+
 # Using the values of the formulaList data frame, loop through all combinations of models.
-for (row in 1:nrow(formulaList)) {  
+# for (row in 1:nrow(formulaList)) {  
+for (row in 1:1) {  
   modelName <-  formulaList[row, "LongName"]
-  Density <- formulaList[row, "Density"]
-  group <- formulaList[row, "g0"]
-  sig <- formulaList[row, "s"]
+  density <- formulaList[row, "Density"]
+  cap_probability <- formulaList[row, "g0"]
+  movement <- formulaList[row, "s"]
   
   print(glue("Running {modelName}"))
   
-  modelList <- list(as.formula(glue("D ~ {Density}")), as.formula(glue("g0 ~ {group}")), as.formula(glue("sigma ~ {sig}")))
+  modelList <- list(as.formula(glue("D ~ {density}")), as.formula(glue("g0 ~ {cap_probability}")), as.formula(glue("sigma ~ {movement}")))
   
   fit <- secr.fit(Capthist,
                   model = modelList ,

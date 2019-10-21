@@ -22,7 +22,7 @@ source(here("functions.R"))
 # Set variables and paths specific to island and year.
 island <- "SMI"
 year <- "2019"
-setwd(here(island, year, "First run"))
+setwd(here(island, year, "Adults"))
 
 island_areas <- tribble(
   ~island, ~area_km2,
@@ -53,8 +53,8 @@ allModels <- map(ls(pattern = "Model"), get)
 modelNames <- tools::file_path_sans_ext(allFiles)
 names(allModels) <- modelNames
 
-# Apply the predict function to all models.
-allModels_predict <- purrr::map(allModels, 
+# Apply the predict function to all models to get 80 percent confidence interval. 
+allModels_80percent <- purrr::map(allModels, 
                                 ~predict(.x, 
                                          newdata = NULL, 
                                          type = c('response','link'), 
@@ -77,7 +77,7 @@ sex <- c("male", "female")
 param <- c("D", "g0", "sigma")
 
 # Get the length of the models to determin if it includes pups.
-modelLength <- length(allModels_predict)
+modelLength <- length(allModels_80percent)
 
 # Include pups if the 112 model. Use expand.grid to make a matrix of inputs.
 if (modelLength == 28){
