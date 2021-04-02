@@ -18,8 +18,8 @@ here()
 rm(list = ls())
 
 # Set variables
-island <- "SMI"
-year <- "2019"
+island <- "SRI"
+year <- "2020"
 setwd(here(island, year))
 inputBufferDir <- here("Master Grid Buffers")
 
@@ -101,12 +101,15 @@ summary(Mask)
 dateStamp <- format(Sys.time(), "%Y%m%d")
 sink(glue("log_{island}_{year}_{dateStamp}.txt"), append = T, split = T)
 
+# Log the package versions, especially import for logging secr version to know
+# which version was used for this run.
+sessionInfo()
+
 # h2 is modeling sex, males females, but can be any two groups. 
 
 
 # Using the values of the formulaList data frame, loop through all combinations of models.
-# for (row in 1:nrow(formulaList)) {  
-for (row in 1:1) {  
+for (row in 1:nrow(formulaList)) {
   modelName <-  formulaList[row, "LongName"]
   density <- formulaList[row, "Density"]
   cap_probability <- formulaList[row, "g0"]
@@ -121,7 +124,9 @@ for (row in 1:1) {
                   trace = TRUE,  # Trace shows the verbose output of the fit.
                   mask=Mask,
                   detectfn=0, # detectfn 0 is halfnormal.
-                  hcov='sex') # hcov is the h covariate
+                  hcov='sex',
+                  # method="BFGS",
+                  ncores = 6) # hcov is the h covariate
 
   # Remove the '+' signs in the file name
   modelNameSave <- gsub("\\+", "_", glue("{modelName}"))

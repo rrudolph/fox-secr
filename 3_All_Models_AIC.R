@@ -20,8 +20,8 @@ here()
 source(here("functions.R"))
 
 # Set variables and paths specific to island and year.
-island <- "SMI"
-year <- "2019"
+island <- "SRI"
+year <- "2020"
 setwd(here(island, year, "Adults"))
 
 island_areas <- tribble(

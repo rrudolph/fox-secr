@@ -27,14 +27,14 @@ here()
 source(here("functions.R"))
 
 # Set variables and paths specific to island and year
-island <- "SMI"
-year <- "2019"
+island <- "SRI"
+year <- "2020"
 
 setwd(here(island, year))
 adultsOnly = T
 
 # captures <- read_excel("2018 SRI GRID DATA_3.6.2019 export.xlsx",
-captures <- read_excel("2019 SMI FOX GRID DATA_10.9.2019 export.xlsx",
+captures <- read_excel("SRI_2020_Grids_Export_3.28.21.xlsx",
                            col_types = c("text", "numeric", "text", 
                                          "date", "numeric", "numeric", "numeric", 
                                          "numeric", "text", "text", "text", 

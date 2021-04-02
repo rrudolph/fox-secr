@@ -16,7 +16,6 @@ pkgList <- c(
 
 
 inst <- pkgList %in% installed.packages()
-if (length(pkgList[!inst]) > 0) install.packages(pkgList[!inst],
-                                                 repos='http://cran.cnr.berkeley.edu/')
-lapply(pkgList, library, character.only = TRUE)
+if (length(pkgList[!inst]) > 0) install.packages(pkgList[!inst])
+# lapply(pkgList, library, character.only = TRUE)
 
