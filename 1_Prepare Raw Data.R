@@ -149,7 +149,7 @@ captures <- captures %>%
     X_NAD83z10     = map_dbl(utm_convert, ~.[,1]),
     Y_NAD83z10     = map_dbl(utm_convert, ~.[,2])) %>%
   dplyr::select(-utm_convert, -crs_str) %>%
-  as_tibble()
+  tibble()
 
 
 
@@ -219,6 +219,7 @@ captures_fill <- captures_fox %>%
   fill(AgeClass, .direction =  "up") %>%
   fill(Sex, .direction = "down") %>%
   fill(AgeClass, .direction =  "down")
+
 
 # See how the numbers of each changed after the fill.
 table(captures_fill$AgeClass, useNA = "always")

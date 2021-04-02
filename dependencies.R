@@ -20,7 +20,7 @@ pkgList <- c(
 
 # Install the packages if they are not already.
 inst <- pkgList %in% installed.packages()
-if (length(pkgList[!inst]) > 0) install.packages(pkgList[!inst]))
+if (length(pkgList[!inst]) > 0) install.packages(pkgList[!inst])
 
 # Optional to load them, but typically just load them in the scripts.
 # lapply(pkgList, library, character.only = TRUE)
