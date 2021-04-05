@@ -42,6 +42,9 @@ pittags_all_years_sex <- captures %>%
   summarise(LasVal = last(Sex)) %>% 
   spread(SamplingYear, LasVal)
 
+# Get unique values in rows. Should all be 3 (pit tag, na/ and sex)
+apply(pittags_all_years_sex, 1, function(x)length(unique(x)))
+
 write.xlsx(pittags_all_years_sex,"pittags_all_years_sex.xlsx")
 
 

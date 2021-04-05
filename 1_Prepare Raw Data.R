@@ -33,14 +33,14 @@ year <- "2020"
 setwd(here(island, year))
 adultsOnly = T
 
-# captures <- read_excel("2018 SRI GRID DATA_3.6.2019 export.xlsx",
-captures <- read_excel("SRI_2020_Grids_Export_3.28.21.xlsx",
-                           col_types = c("text", "numeric", "text", 
-                                         "date", "numeric", "numeric", "numeric", 
-                                         "numeric", "text", "text", "text", 
-                                         "text", "text", "text", "text", "text", 
-                                         "text", "numeric", "text", "text", 
-                                         "text", "text", "text", "skip"))
+
+captures <- read_excel("SRI_2020_Grids_Export_4.02.21.xlsx",
+                       col_types = c("text", "numeric", "text",
+                                     "date", "numeric", "numeric", "numeric",
+                                     "numeric", "text", "text", "text",
+                                     "skip", "text", "text", "text", "text", "text",
+                                     "text", "numeric", "text", "text",
+                                     "text", "text", "text", "skip", "skip"))
 
 ### Take a close look at the data ----
 
