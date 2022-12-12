@@ -270,6 +270,14 @@ multi_captures_per_day <- as.data.frame.matrix(table(captures_fill$Pittag, captu
 # Display it.
 multi_captures_per_day 
 
+
+# Make sure the recapture R2 foxes also have a primary P or N capture type.
+capture_check <- as.data.frame.matrix(table(captures_fill$Pittag, captures_fill$CaptureType)) %>%
+  rownames_to_column(var = "Pittag") %>%
+  filter(R2 > 0 & (N == 0 & P == 0 )) 
+# Display it.
+capture_check
+
 # Check for any foxes that have been seen in multiple grids.
 multi_grid_fox <- as.data.frame.matrix(table(captures_fill$Pittag, captures_fill$GridCode))
 # multi_grid_fox[4,1] <- 10 # Test it to show it works
