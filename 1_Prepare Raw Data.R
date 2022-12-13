@@ -7,6 +7,10 @@
 # Date: 1/30/2019
 
 
+renv::init()
+
+
+
 library(readxl)
 library(tidyverse)
 library(glue)
@@ -19,6 +23,8 @@ library(rgeos)
 library(here)
 
 
+
+
 # Clear any environment variables in memory
 rm(list = ls())
 
@@ -27,20 +33,22 @@ here()
 source(here("functions.R"))
 
 # Set variables and paths specific to island and year
-island <- "SRI"
-year <- "2020"
+island <- "SMI"
+year <- "2022"
 
 setwd(here(island, year))
 adultsOnly = T
 
+# 
+# captures <- read_excel("2019 SRI GRID DATA_12.2.2019 export.xlsx",
+#                        col_types = c("text", "numeric", "text",
+#                                      "date", "numeric", "numeric", "numeric",
+#                                      "numeric", "text", "text", "text",
+#                                      "skip", "text", "text", "text", "text", "text",
+#                                      "text", "numeric", "text", "text",
+#                                      "text", "text", "text", "skip", "skip"))
 
-captures <- read_excel("SRI_2020_Grids_Export_4.02.21.xlsx",
-                       col_types = c("text", "numeric", "text",
-                                     "date", "numeric", "numeric", "numeric",
-                                     "numeric", "text", "text", "text",
-                                     "skip", "text", "text", "text", "text", "text",
-                                     "text", "numeric", "text", "text",
-                                     "text", "text", "text", "skip", "skip"))
+captures <- read_excel("SMI_Grids_2022_12.6.22.xlsx")
 
 ### Take a close look at the data ----
 
@@ -270,13 +278,15 @@ multi_captures_per_day <- as.data.frame.matrix(table(captures_fill$Pittag, captu
 # Display it.
 multi_captures_per_day 
 
-
-# Make sure the recapture R2 foxes also have a primary P or N capture type.
-capture_check <- as.data.frame.matrix(table(captures_fill$Pittag, captures_fill$CaptureType)) %>%
+# check if any foxes have more than one initial capture (P or N)
+as.data.frame.matrix(table(captures_fill$Pittag, captures_fill$CaptureType)) %>%
   rownames_to_column(var = "Pittag") %>%
-  filter(R2 > 0 & (N == 0 & P == 0 )) 
-# Display it.
-capture_check
+  filter(N + P > 1)
+
+# make sure all foxes have at least one initial capture (P or N)
+as.data.frame.matrix(table(captures_fill$Pittag, captures_fill$CaptureType)) %>%
+  rownames_to_column(var = "Pittag") %>%
+  filter(N + P < 1)
 
 # Check for any foxes that have been seen in multiple grids.
 multi_grid_fox <- as.data.frame.matrix(table(captures_fill$Pittag, captures_fill$GridCode))
