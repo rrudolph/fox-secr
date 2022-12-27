@@ -115,5 +115,7 @@ write_table <- function(sex, age, param){
     temp <- rbind(temp, as.numeric(temp[nrow(temp),]) * islandArea)
     temp[nrow(temp),1]<-"*IslandArea"
   }
-  write.xlsx(temp, glue("{island}_{year}.xlsx"), sheetName=glue("{sex}_{age}_{param}"), append=T)
+  # Removing this because of the difficulties with Java
+  # write_xlsx(temp, glue("{island}_{year}.xlsx"), sheetName=glue("{sex}_{age}_{param}"), append=T)
+  write_xlsx(temp, glue("{island}_{year}_{sex}_{age}_{param}.xlsx"))
 }

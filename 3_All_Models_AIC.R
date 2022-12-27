@@ -7,10 +7,14 @@
 library(glue)
 library(tidyverse)
 library(janitor)
-library(xlsx)
 library(here)
 library(secr)
 
+# The xlsx library was giving tons of headaches with Java
+# library(xlsx) 
+
+# Using this instead
+library(writexl)
 
 # Clear any environment variables in memory.
 rm(list = ls())
